@@ -1,10 +1,26 @@
 import { NextRequest, NextResponse } from "next/server";
 
+function resolveBaseUrl(req: NextRequest): string {
+  const forwardedHost = req.headers.get("x-forwarded-host") || req.headers.get("host");
+  const forwardedProto = req.headers.get("x-forwarded-proto") || (forwardedHost?.includes("localhost") ? "http" : "https");
+
+  if (forwardedHost) {
+    return `${forwardedProto}://${forwardedHost}`;
+  }
+
+  return (
+    process.env.RENDER_EXTERNAL_URL ||
+    process.env.NEXT_PUBLIC_APP_URL ||
+    req.nextUrl.origin ||
+    "http://localhost:3000"
+  );
+}
+
 export async function GET(req: NextRequest) {
   const clientId = process.env.GITHUB_CLIENT_ID?.trim();
   const clientSecret = process.env.GITHUB_CLIENT_SECRET?.trim();
 
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || req.nextUrl.origin || "http://localhost:3000";
+  const baseUrl = resolveBaseUrl(req);
   const callbackUrl = `${baseUrl}/api/auth/github/callback`;
 
   if (!clientId || !clientSecret) {

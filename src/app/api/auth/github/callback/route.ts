@@ -2,8 +2,24 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { hashPassword, createSessionToken, AUTH_COOKIE_NAME, ensureAdminUserExists } from "@/lib/auth";
 
+function resolveBaseUrl(req: NextRequest): string {
+  const forwardedHost = req.headers.get("x-forwarded-host") || req.headers.get("host");
+  const forwardedProto = req.headers.get("x-forwarded-proto") || (forwardedHost?.includes("localhost") ? "http" : "https");
+
+  if (forwardedHost) {
+    return `${forwardedProto}://${forwardedHost}`;
+  }
+
+  return (
+    process.env.RENDER_EXTERNAL_URL ||
+    process.env.NEXT_PUBLIC_APP_URL ||
+    req.nextUrl.origin ||
+    "http://localhost:3000"
+  );
+}
+
 export async function GET(req: NextRequest) {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || req.nextUrl.origin || "http://localhost:3000";
+  const baseUrl = resolveBaseUrl(req);
 
   try {
     await ensureAdminUserExists();
