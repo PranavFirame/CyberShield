@@ -114,4 +114,98 @@ describe("Advanced High-Severity Vulnerability Engine", () => {
     const massAssign = findings.find((f) => f.ruleId.includes("mass-assignment"));
     expect(massAssign).toBeDefined();
   });
+
+  it("excludes test fixtures and spec files from vulnerability audits", () => {
+    const testFiles = [
+      {
+        path: "tests/exploit.test.ts",
+        content: `
+          // Vulnerable payload in test fixture
+          const res = await fetch(req.query.target);
+          const cloned = Object.assign({}, req.body);
+        `,
+      },
+      {
+        path: "src/__tests__/auth.spec.ts",
+        content: `
+          const html = ejs.render(req.params.template);
+        `,
+      },
+    ];
+
+    const findings = analyzeRepositoryFiles("test/repo", testFiles);
+    expect(findings).toHaveLength(0);
+  });
+
+  it("detects genuine CORS origin reflection and TOCTOU race conditions", () => {
+    const testFiles = [
+      {
+        path: "src/api/cors-route.ts",
+        content: `
+          res.setHeader('Access-Control-Allow-Origin', req.headers.origin);
+        `,
+      },
+      {
+        path: "src/utils/file-cleaner.ts",
+        content: `
+          if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+        `,
+      },
+    ];
+
+    const findings = analyzeRepositoryFiles("test/repo", testFiles);
+    const corsFinding = findings.find((f) => f.ruleId.includes("cors"));
+    expect(corsFinding).toBeDefined();
+    expect(corsFinding?.severity).toBe("HIGH");
+
+    const toctouFinding = findings.find((f) => f.ruleId.includes("toctou"));
+    expect(toctouFinding).toBeDefined();
+    expect(toctouFinding?.severity).toBe("MEDIUM");
+  });
+
+  it("produces 0 false positives when auditing scanner engine itself", async () => {
+    const fs = await import("node:fs");
+    const path = await import("node:path");
+    const engineContent = fs.readFileSync(path.resolve(__dirname, "../lib/scanner-engine.ts"), "utf-8");
+
+    const findings = analyzeRepositoryFiles("PranavFirame/CyberShield", [
+      {
+        path: "src/lib/scanner-engine.ts",
+        content: engineContent,
+      },
+    ]);
+
+    expect(findings).toHaveLength(0);
+  });
+
+  it("produces 0 findings when auditing all application source code in src/lib and src/app", async () => {
+    const fs = await import("node:fs");
+    const path = await import("node:path");
+
+    function getFiles(dir: string, baseDir: string): { path: string; content: string }[] {
+      const entries = fs.readdirSync(dir, { withFileTypes: true });
+      let files: { path: string; content: string }[] = [];
+      for (const entry of entries) {
+        const fullPath = path.join(dir, entry.name);
+        const relPath = path.relative(baseDir, fullPath).replace(/\\/g, "/");
+        if (entry.isDirectory()) {
+          files = files.concat(getFiles(fullPath, baseDir));
+        } else if (/\.(ts|tsx|js|jsx)$/.test(entry.name)) {
+          files.push({
+            path: relPath,
+            content: fs.readFileSync(fullPath, "utf-8"),
+          });
+        }
+      }
+      return files;
+    }
+
+    const baseDir = path.resolve(__dirname, "../..");
+    const srcLibFiles = getFiles(path.resolve(baseDir, "src/lib"), baseDir);
+    const srcAppFiles = getFiles(path.resolve(baseDir, "src/app"), baseDir);
+    const allFiles = [...srcLibFiles, ...srcAppFiles];
+
+    const findings = analyzeRepositoryFiles("PranavFirame/CyberShield", allFiles);
+    expect(findings).toHaveLength(0);
+  });
 });
