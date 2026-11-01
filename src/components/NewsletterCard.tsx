@@ -108,16 +108,16 @@ export default function NewsletterCard({
   }
 
   return (
-    <div className="relative overflow-hidden vault-card p-6 sm:p-8 shadow-2xl border border-white/10 bg-[#0E111A]/90">
+    <div className="relative overflow-hidden bg-gradient-to-br from-sky-500/10 via-white to-slate-50 border border-sky-200/80 rounded-2xl p-6 sm:p-8 shadow-xs">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
         <div className="max-w-xl">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#F09E4F]/10 text-[#F09E4F] border border-[#F09E4F]/30 text-[11px] font-semibold mb-2.5">
-            <Shield className="h-3 w-3 text-[#F09E4F]" /> MONTHLY DEFENSIVE INTELLIGENCE
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-sky-100 text-sky-800 text-[11px] font-semibold mb-2.5">
+            <Shield className="h-3 w-3 text-sky-600" /> MONTHLY SECURITY INTELLIGENCE
           </div>
-          <h3 className="text-lg sm:text-xl font-bold text-white tracking-tight">
+          <h3 className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight">
             {title}
           </h3>
-          <p className="text-xs sm:text-sm text-slate-400 mt-1.5 leading-relaxed">
+          <p className="text-xs sm:text-sm text-slate-600 mt-1.5 leading-relaxed">
             {description}
           </p>
         </div>
@@ -125,50 +125,57 @@ export default function NewsletterCard({
         <form onSubmit={handleSubmit} className="flex flex-col gap-2 w-full sm:max-w-sm">
           <div className="flex gap-2">
             <div className="relative flex-1">
-              <Mail className="absolute left-3.5 top-3 h-4 w-4 text-slate-500" />
+              <Mail className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
               <input
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="dev@company.com"
-                className="w-full pl-10 pr-4 py-2.5 text-xs bg-white/5 border border-white/10 rounded-full text-white placeholder:text-slate-500 focus:outline-none focus:border-[#F09E4F] focus:ring-1 focus:ring-[#F09E4F] font-mono"
+                className="w-full pl-9 pr-3 py-2.5 text-xs bg-white border border-slate-300 rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-sky-600 focus:ring-1 focus:ring-sky-600 shadow-2xs"
               />
             </div>
             <button
               type="submit"
               disabled={loading}
-              className="px-5 py-2.5 rounded-full bg-[#F09E4F] hover:bg-[#E08E3F] text-xs font-bold text-slate-950 transition disabled:opacity-50 flex items-center justify-center cursor-pointer shadow-md shadow-[rgba(240,158,79,0.25)] shrink-0"
+              className="px-4 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-xs font-semibold text-white transition disabled:opacity-50 flex items-center justify-center gap-1.5 cursor-pointer shadow-md shadow-sky-600/20 shrink-0"
             >
               {loading ? (
-                <Loader2 className="h-3.5 w-3.5 animate-spin text-slate-950" />
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
               ) : (
-                <div className="flex items-center gap-1">
-                  <span>Subscribe</span>
-                  <ArrowRight className="h-3 w-3" />
-                </div>
+                <>
+                  <span>Join</span>
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </>
               )}
             </button>
           </div>
 
-          <label className="flex items-center gap-2 text-[11px] text-slate-400 cursor-pointer pt-1">
+          <label className="flex items-start gap-1.5 text-[11px] text-slate-500 cursor-pointer pt-0.5">
             <input
               type="checkbox"
               checked={consent}
               onChange={(e) => setConsent(e.target.checked)}
-              className="rounded border-slate-700 bg-white/5 text-[#F09E4F] focus:ring-[#F09E4F] h-3.5 w-3.5"
+              className="mt-0.5 rounded border-slate-300 text-sky-600 focus:ring-sky-500 h-3 w-3"
             />
-            <span>I agree to receive monthly security digests. Unsubscribe anytime.</span>
+            <span>I agree to receive security advisories. 1-click unsubscribe anytime.</span>
           </label>
 
           {message && (
-            <p
-              className={`text-xs mt-1 font-medium ${
-                message.type === "success" ? "text-[#64D771]" : "text-rose-400"
+            <div
+              className={`p-2.5 rounded-xl text-xs flex items-center gap-2 ${
+                message.type === "success"
+                  ? "bg-emerald-50 border border-emerald-200 text-emerald-800"
+                  : "bg-rose-50 border border-rose-200 text-rose-800"
               }`}
             >
-              {message.text}
-            </p>
+              {message.type === "success" ? (
+                <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
+              ) : (
+                <AlertCircle className="h-4 w-4 text-rose-600 shrink-0" />
+              )}
+              <span>{message.text}</span>
+            </div>
           )}
         </form>
       </div>

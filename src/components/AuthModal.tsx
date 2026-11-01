@@ -96,55 +96,55 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-md p-4">
-      <div className="vault-card bg-[#0A0D14]/95 border border-white/10 rounded-3xl shadow-2xl max-w-md w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150 text-white">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-3 sm:p-4">
+      <div className="bg-white border border-slate-200 rounded-2xl shadow-2xl max-w-md w-full max-h-[92vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-[#0E1017]">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-3.5 sm:py-4 border-b border-slate-200 bg-slate-50/50">
           <div className="flex items-center gap-2.5">
-            <div className="h-8 w-8 rounded-full bg-[#F09E4F]/20 border border-[#F09E4F]/30 flex items-center justify-center text-[#F09E4F] shadow-xs">
+            <div className="h-8 w-8 rounded-lg bg-sky-600 flex items-center justify-center text-white shadow-xs">
               <Shield className="h-4 w-4" />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-white">CyberShield Access</h3>
-              <p className="text-[11px] text-slate-400 font-mono">Sign in to sync GitHub repos & track audits</p>
+              <h3 className="text-sm font-bold text-slate-900">CyberShield Access</h3>
+              <p className="text-[10px] sm:text-[11px] text-slate-500">Sign in to track reports & locate previous scans</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-white transition p-1.5 rounded-full hover:bg-white/10 cursor-pointer"
+            className="text-slate-400 hover:text-slate-700 transition p-1 rounded-lg hover:bg-slate-100 cursor-pointer"
           >
             <X className="h-4 w-4" />
           </button>
         </div>
 
         {/* Tab Strip */}
-        <div className="grid grid-cols-3 border-b border-white/10 text-xs font-semibold text-center font-mono">
+        <div className="grid grid-cols-3 border-b border-slate-200 text-[11px] sm:text-xs font-semibold text-center">
           <button
             onClick={() => { setTab("LOGIN"); setError(null); }}
-            className={`py-3 transition cursor-pointer border-b-2 ${
+            className={`py-2.5 sm:py-3 transition cursor-pointer border-b-2 ${
               tab === "LOGIN"
-                ? "border-[#F09E4F] text-[#F09E4F] bg-[#F09E4F]/10"
-                : "border-transparent text-slate-400 hover:text-white"
+                ? "border-sky-600 text-sky-700 bg-sky-50/30"
+                : "border-transparent text-slate-500 hover:text-slate-900"
             }`}
           >
             Sign In
           </button>
           <button
             onClick={() => { setTab("REGISTER"); setError(null); }}
-            className={`py-3 transition cursor-pointer border-b-2 ${
+            className={`py-2.5 sm:py-3 transition cursor-pointer border-b-2 ${
               tab === "REGISTER"
-                ? "border-[#F09E4F] text-[#F09E4F] bg-[#F09E4F]/10"
-                : "border-transparent text-slate-400 hover:text-white"
+                ? "border-sky-600 text-sky-700 bg-sky-50/30"
+                : "border-transparent text-slate-500 hover:text-slate-900"
             }`}
           >
             Register
           </button>
           <button
             onClick={() => { setTab("GITHUB"); setError(null); }}
-            className={`py-3 transition cursor-pointer border-b-2 ${
+            className={`py-2.5 sm:py-3 transition cursor-pointer border-b-2 ${
               tab === "GITHUB"
-                ? "border-[#F09E4F] text-[#F09E4F] bg-[#F09E4F]/10"
-                : "border-transparent text-slate-400 hover:text-white"
+                ? "border-sky-600 text-sky-700 bg-sky-50/30"
+                : "border-transparent text-slate-500 hover:text-slate-900"
             }`}
           >
             GitHub OAuth
@@ -152,10 +152,10 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
         </div>
 
         {/* Body */}
-        <div className="p-6">
+        <div className="p-4 sm:p-6 overflow-y-auto">
           {error && (
-            <div className="mb-4 p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl text-xs text-rose-400 flex items-start gap-2">
-              <AlertCircle className="h-4 w-4 shrink-0 mt-0.5 text-rose-400" />
+            <div className="mb-4 p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700 flex items-start gap-2">
+              <AlertCircle className="h-4 w-4 shrink-0 mt-0.5 text-rose-600" />
               <div className="space-y-1">
                 <span>{error}</span>
                 {tab === "GITHUB" && (
@@ -164,7 +164,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                       href="https://github.com/settings/developers"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-[#F09E4F] font-semibold hover:underline inline-flex items-center gap-1 text-[11px]"
+                      className="text-sky-700 font-semibold hover:underline inline-flex items-center gap-1 text-[11px]"
                     >
                       <span>Open GitHub Developer Settings</span>
                       <ExternalLink className="h-3 w-3" />
@@ -178,31 +178,31 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
           {tab === "LOGIN" && (
             <form onSubmit={handleLogin} className="flex flex-col gap-3.5">
               <div>
-                <label className="text-xs font-semibold text-slate-300 mb-1 block">Username or Email</label>
+                <label className="text-xs font-semibold text-slate-700 mb-1 block">Username or Email</label>
                 <div className="relative">
-                  <User className="absolute left-3.5 top-3 h-4 w-4 text-slate-500" />
+                  <User className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
                   <input
                     type="text"
                     required
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     placeholder="Username or email address"
-                    className="w-full pl-10 pr-4 py-2.5 text-xs bg-white/5 border border-white/10 rounded-full text-white placeholder-slate-500 focus:outline-none focus:border-[#F09E4F] focus:ring-1 focus:ring-[#F09E4F] font-mono"
+                    className="w-full pl-9 pr-3 py-2.5 text-xs bg-slate-50 border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:border-sky-600 focus:ring-1 focus:ring-sky-600"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-slate-300 mb-1 block">Password</label>
+                <label className="text-xs font-semibold text-slate-700 mb-1 block">Password</label>
                 <div className="relative">
-                  <Lock className="absolute left-3.5 top-3 h-4 w-4 text-slate-500" />
+                  <Lock className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
                   <input
                     type="password"
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••••••"
-                    className="w-full pl-10 pr-4 py-2.5 text-xs bg-white/5 border border-white/10 rounded-full text-white placeholder-slate-500 focus:outline-none focus:border-[#F09E4F] focus:ring-1 focus:ring-[#F09E4F] font-mono"
+                    className="w-full pl-9 pr-3 py-2.5 text-xs bg-slate-50 border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:border-sky-600 focus:ring-1 focus:ring-sky-600"
                   />
                 </div>
               </div>
@@ -210,7 +210,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
               <button
                 type="submit"
                 disabled={loading}
-                className="mt-2 w-full py-2.5 rounded-full bg-[#F09E4F] hover:bg-[#E08E3F] font-bold text-xs text-slate-950 shadow-md shadow-[rgba(240,158,79,0.25)] disabled:opacity-50 transition flex items-center justify-center gap-2 cursor-pointer"
+                className="mt-2 w-full py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 font-semibold text-xs text-white shadow-md shadow-sky-600/20 disabled:opacity-50 transition flex items-center justify-center gap-2 cursor-pointer"
               >
                 {loading ? "Authenticating..." : "Sign In to CyberShield"}
               </button>
@@ -220,44 +220,44 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
           {tab === "REGISTER" && (
             <form onSubmit={handleRegister} className="flex flex-col gap-3.5">
               <div>
-                <label className="text-xs font-semibold text-slate-300 mb-1 block">Username</label>
+                <label className="text-xs font-semibold text-slate-700 mb-1 block">Username</label>
                 <input
                   type="text"
                   required
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   placeholder="Choose your username"
-                  className="w-full px-4 py-2.5 text-xs bg-white/5 border border-white/10 rounded-full text-white placeholder-slate-500 focus:outline-none focus:border-[#F09E4F] font-mono"
+                  className="w-full px-3 py-2.5 text-xs bg-slate-50 border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:border-sky-600"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-slate-300 mb-1 block">Email (Optional)</label>
+                <label className="text-xs font-semibold text-slate-700 mb-1 block">Email (Optional)</label>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="dev@example.com"
-                  className="w-full px-4 py-2.5 text-xs bg-white/5 border border-white/10 rounded-full text-white placeholder-slate-500 focus:outline-none focus:border-[#F09E4F] font-mono"
+                  className="w-full px-3 py-2.5 text-xs bg-slate-50 border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:border-sky-600"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-slate-300 mb-1 block">Password</label>
+                <label className="text-xs font-semibold text-slate-700 mb-1 block">Password</label>
                 <input
                   type="password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="At least 6 characters"
-                  className="w-full px-4 py-2.5 text-xs bg-white/5 border border-white/10 rounded-full text-white placeholder-slate-500 focus:outline-none focus:border-[#F09E4F] font-mono"
+                  className="w-full px-3 py-2.5 text-xs bg-slate-50 border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:border-sky-600"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={loading}
-                className="mt-2 w-full py-2.5 rounded-full bg-[#F09E4F] hover:bg-[#E08E3F] font-bold text-xs text-slate-950 shadow-md shadow-[rgba(240,158,79,0.25)] disabled:opacity-50 transition flex items-center justify-center gap-2 cursor-pointer"
+                className="mt-2 w-full py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 font-semibold text-xs text-white shadow-md shadow-sky-600/20 disabled:opacity-50 transition flex items-center justify-center gap-2 cursor-pointer"
               >
                 {loading ? "Creating Profile..." : "Create Account"}
               </button>
@@ -266,11 +266,11 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
 
           {tab === "GITHUB" && (
             <div className="flex flex-col items-center py-4 text-center">
-              <div className="h-14 w-14 rounded-full bg-white/10 text-white flex items-center justify-center mb-3 shadow-md border border-white/10">
-                <Github className="h-8 w-8 text-[#F09E4F]" />
+              <div className="h-14 w-14 rounded-2xl bg-slate-900 text-white flex items-center justify-center mb-3 shadow-md">
+                <Github className="h-8 w-8" />
               </div>
-              <h4 className="text-base font-bold text-white">GitHub Single Sign-On</h4>
-              <p className="text-xs text-slate-400 max-w-sm mt-1.5 leading-relaxed">
+              <h4 className="text-base font-bold text-slate-900">GitHub Single Sign-On</h4>
+              <p className="text-xs text-slate-500 max-w-sm mt-1.5 leading-relaxed">
                 Authenticate securely using official GitHub OAuth 2.0. CyberShield verifies your identity directly with GitHub to sync and 1-click audit your repositories.
               </p>
 
@@ -278,15 +278,15 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                 type="button"
                 onClick={handleInitiateGithubOAuth}
                 disabled={loading}
-                className="mt-6 w-full py-3 rounded-full bg-white hover:bg-slate-100 font-bold text-xs text-slate-950 shadow-lg transition flex items-center justify-center gap-2.5 cursor-pointer disabled:opacity-50"
+                className="mt-6 w-full py-3 rounded-xl bg-slate-900 hover:bg-slate-800 font-semibold text-xs text-white shadow-md shadow-slate-900/20 transition flex items-center justify-center gap-2.5 cursor-pointer disabled:opacity-50"
               >
                 <Github className="h-4 w-4" />
                 <span>{loading ? "Connecting to GitHub..." : "Sign in with GitHub"}</span>
                 <ArrowRight className="h-3.5 w-3.5" />
               </button>
 
-              <p className="text-[11px] text-slate-500 mt-4 max-w-xs leading-normal font-mono">
-                Redirects to GitHub for authorization. Requests read-only access to your public repositories.
+              <p className="text-[11px] text-slate-400 mt-4 max-w-xs leading-normal">
+                You will be redirected to GitHub to authorize CyberShield. We request read-only access to your public repositories.
               </p>
             </div>
           )}

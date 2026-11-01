@@ -96,15 +96,15 @@ export default function HistoryModal({ isOpen, onClose, onSelectScan }: HistoryM
   );
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4">
-      <div className="bg-white border border-slate-200 rounded-2xl shadow-2xl max-w-3xl w-full max-h-[85vh] flex flex-col overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-3 sm:p-4">
+      <div className="bg-white border border-slate-200 rounded-2xl shadow-2xl max-w-3xl w-full max-h-[92vh] sm:max-h-[85vh] flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-slate-50/50">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-3.5 sm:py-4 border-b border-slate-200 bg-slate-50/50">
           <div className="flex items-center gap-2">
             <Clock className="h-5 w-5 text-sky-600" />
             <div>
               <h3 className="text-sm font-bold text-slate-900">Historical Scans & Vulnerability Logs</h3>
-              <p className="text-[11px] text-slate-500">Locate previous reports, findings, and remediation diffs</p>
+              <p className="text-[10px] sm:text-[11px] text-slate-500">Locate previous reports, findings, and remediation diffs</p>
             </div>
           </div>
           <button
@@ -195,7 +195,7 @@ export default function HistoryModal({ isOpen, onClose, onSelectScan }: HistoryM
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3 shrink-0">
+                  <div className="flex items-center gap-2 sm:gap-3 justify-between sm:justify-end w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100 shrink-0">
                     <span className={`px-2.5 py-1 rounded-lg text-xs font-bold font-mono border ${riskColor}`}>
                       Risk {item.riskScore}
                     </span>

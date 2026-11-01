@@ -6,7 +6,7 @@ export default function GlobalFooter() {
   return (
     <footer className="bg-white border-t border-slate-200 mt-auto">
       {/* Newsletter Bar */}
-      <div className="border-b border-slate-100 py-8 px-4 sm:px-6 bg-slate-50/60">
+      <div className="border-b border-slate-100 py-6 sm:py-8 px-4 sm:px-6 bg-slate-50/60">
         <div className="max-w-6xl mx-auto">
           <NewsletterCard
             source="global_footer"
@@ -18,10 +18,10 @@ export default function GlobalFooter() {
       </div>
 
       {/* Multi-Column Links */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12">
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-8">
           {/* Brand Col */}
-          <div className="col-span-2">
+          <div className="col-span-1 sm:col-span-2 md:col-span-2">
             <Link href="/" className="flex items-center gap-2.5">
               <div className="h-8 w-8 rounded-xl bg-slate-900 text-white flex items-center justify-center shadow-xs">
                 <Shield className="h-4 w-4 text-sky-400" />
@@ -117,7 +117,7 @@ export default function GlobalFooter() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="mt-12 pt-6 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-400">
+        <div className="mt-8 sm:mt-12 pt-6 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-400">
           <div>
             © {new Date().getFullYear()} CyberShield Security Systems. All rights reserved.
           </div>

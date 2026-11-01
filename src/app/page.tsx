@@ -36,10 +36,12 @@ import {
   Github,
   BookOpen,
   HelpCircle,
+  Menu,
+  X,
+  ArrowRight,
 } from "lucide-react";
 import { Finding, ScanReport } from "@/types/security";
 import { exportReportToPdf } from "@/lib/pdf-generator";
-import FloatingNavPill from "@/components/FloatingNavPill";
 import AuthModal from "@/components/AuthModal";
 import ProfileModal from "@/components/ProfileModal";
 import HistoryModal from "@/components/HistoryModal";
@@ -332,6 +334,7 @@ export default function CyberShieldLightApp() {
   const [profileModalOpen, setProfileModalOpen] = useState(false);
   const [historyModalOpen, setHistoryModalOpen] = useState(false);
   const [adminModalOpen, setAdminModalOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // GitHub Repositories for logged in GitHub user
   const [userRepos, setUserRepos] = useState<GithubRepoItem[]>([]);
@@ -539,170 +542,340 @@ export default function CyberShieldLightApp() {
       {/* 4. No Internet State (Offline Banner + Cached indicator) */}
       <OfflineBanner />
 
-      {/* ── CloudVault-Inspired Floating Nav Pill ────────────────── */}
-      <FloatingNavPill
-        user={currentUser}
-        onOpenAuth={() => setAuthModalOpen(true)}
-        onOpenProfile={() => setProfileModalOpen(true)}
-        onOpenHistory={() => setHistoryModalOpen(true)}
-        onOpenAdmin={() => setAdminModalOpen(true)}
-        onLogout={handleLogout}
-        onScrollToAudit={() => {
-          const el = document.getElementById("audit-terminal");
-          if (el) el.scrollIntoView({ behavior: "smooth" });
-        }}
-      />
+      {/* ── Top Navigation Bar ────────────────────────────── */}
+      <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur px-4 sm:px-6 py-3 sm:py-3.5 flex flex-col shadow-2xs">
+        <div className="flex items-center justify-between">
+          {/* Logo & Product Title */}
+          <Link href="/" className="flex items-center gap-2.5 sm:gap-3 group">
+            <div className="h-8 sm:h-9 w-8 sm:w-9 rounded-xl bg-gradient-to-tr from-sky-600 to-indigo-600 flex items-center justify-center shadow-md shadow-sky-600/20 group-hover:scale-105 transition-transform">
+              <Shield className="h-4 sm:h-5 w-4 sm:w-5 text-white" />
+            </div>
+            <div>
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <span className="font-extrabold text-sm sm:text-base tracking-tight text-slate-900">Cyber<span className="text-sky-600">Shield</span></span>
+                <span className="text-[9px] sm:text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-sky-50 text-sky-700 border border-sky-200">
+                  ENTERPRISE SCANNER
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-500 hidden sm:block">AST Vulnerability Analysis & Disaster Risk Modeling</p>
+            </div>
+          </Link>
 
-      {/* ── Hero Search Section (CloudVault Inspired) ──────────────── */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-[#0A0D14] via-[#0E111A] to-[#131620] border-b border-white/10 py-16 px-6">
-        {/* Subtle Ambient Glow */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96 bg-[#F09E4F]/10 rounded-full blur-3xl pointer-events-none -z-0" />
+          {/* Desktop Navigation Links & Controls */}
+          <div className="hidden md:flex items-center gap-2.5 text-xs">
+            {/* Navigation Links */}
+            <nav className="flex items-center gap-1 font-semibold text-slate-600 mr-1">
+              <Link
+                href="/blog"
+                className="px-2.5 py-1.5 rounded-lg hover:text-slate-900 hover:bg-slate-100 transition flex items-center gap-1"
+              >
+                <BookOpen className="h-3.5 w-3.5 text-sky-600" />
+                <span>Blog</span>
+              </Link>
+              <Link
+                href="/faq"
+                className="px-2.5 py-1.5 rounded-lg hover:text-slate-900 hover:bg-slate-100 transition flex items-center gap-1"
+              >
+                <HelpCircle className="h-3.5 w-3.5 text-sky-600" />
+                <span>FAQ</span>
+              </Link>
+            </nav>
 
-        <div className="relative z-10 max-w-4xl mx-auto text-center">
-          {/* Live Status Pill with Emerald Pulse */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#131620]/90 border border-white/10 text-xs font-mono text-slate-300 shadow-lg mb-6">
-            <span className="w-2 h-2 rounded-full bg-[#64D771] animate-pulse" />
-            <span className="text-[#64D771] font-semibold">Zero-Execution AST Sandbox Active</span>
-            <span className="text-slate-600 hidden sm:inline">•</span>
-            <span className="text-slate-400 hidden sm:inline">Defensive Code Intelligence</span>
+            <div className="hidden xl:flex items-center gap-1.5 text-slate-500 border border-slate-200 bg-slate-50 px-3 py-1.5 rounded-full font-medium shadow-2xs">
+              <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+              Zero-Execution Sandbox Active
+            </div>
+
+            {/* History Button (Visible only when user is logged in) */}
+            {currentUser && (
+              <button
+                onClick={() => setHistoryModalOpen(true)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-700 font-semibold transition cursor-pointer shadow-2xs"
+              >
+                <Clock className="h-3.5 w-3.5 text-sky-600" />
+                <span>Scan History</span>
+              </button>
+            )}
+
+            {/* Admin Console Button (Visible for Admin only) */}
+            {currentUser?.role === "ADMIN" && (
+              <button
+                onClick={() => setAdminModalOpen(true)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-indigo-200 bg-indigo-50/80 hover:bg-indigo-100 text-indigo-700 font-bold transition cursor-pointer shadow-2xs"
+              >
+                <ShieldAlert className="h-3.5 w-3.5 text-indigo-600" />
+                <span>Admin Console</span>
+              </button>
+            )}
+
+            {/* Auth State Button */}
+            {currentUser ? (
+              <div className="flex items-center gap-1.5 border-l border-slate-200 pl-2">
+                <button
+                  onClick={() => setProfileModalOpen(true)}
+                  className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-slate-100 border border-transparent hover:border-slate-200 transition cursor-pointer"
+                  title="Profile & Settings"
+                >
+                  <div className="h-6 w-6 rounded-full bg-sky-600 text-white font-bold text-[10px] flex items-center justify-center font-mono uppercase">
+                    {currentUser.username.substring(0, 2)}
+                  </div>
+                  <div className="flex flex-col text-left">
+                    <div className="flex items-center gap-1">
+                      <span className="font-bold text-slate-800 font-mono text-[11px] leading-none">
+                        {currentUser.username}
+                      </span>
+                      {currentUser.githubUsername && (
+                        <Github className="h-3 w-3 text-slate-700" />
+                      )}
+                    </div>
+                    <span className="text-[9px] text-slate-400 font-mono leading-none mt-0.5">
+                      {currentUser.githubUsername ? `@${currentUser.githubUsername}` : currentUser.role}
+                    </span>
+                  </div>
+                  <Settings className="h-3.5 w-3.5 text-slate-400 ml-1" />
+                </button>
+
+                <button
+                  onClick={handleLogout}
+                  className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition cursor-pointer"
+                  title="Sign Out"
+                >
+                  <LogOut className="h-4 w-4" />
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => setAuthModalOpen(true)}
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-sky-600 hover:bg-sky-500 font-semibold text-xs text-white shadow-xs transition cursor-pointer"
+              >
+                <User className="h-3.5 w-3.5" />
+                <span>Sign In / Register</span>
+              </button>
+            )}
           </div>
 
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white mb-4 leading-tight">
-            Your code. Your vulnerabilities.{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#F09E4F] via-[#FFA85C] to-[#E08E3F] drop-shadow-[0_0_24px_rgba(240,158,79,0.35)]">
-              Your shield.
-            </span>
-          </h1>
+          {/* Mobile Right Controls: Compact Profile/Sign-In + Hamburger */}
+          <div className="flex md:hidden items-center gap-2">
+            {currentUser ? (
+              <button
+                onClick={() => setProfileModalOpen(true)}
+                className="h-8 w-8 rounded-full bg-sky-600 text-white font-bold text-xs flex items-center justify-center font-mono uppercase shadow-xs cursor-pointer"
+                title={`${currentUser.username} (${currentUser.role})`}
+              >
+                {currentUser.username.substring(0, 2)}
+              </button>
+            ) : (
+              <button
+                onClick={() => setAuthModalOpen(true)}
+                className="px-2.5 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-white font-semibold text-xs flex items-center gap-1 shadow-xs cursor-pointer"
+              >
+                <User className="h-3.5 w-3.5" />
+                <span>Sign In</span>
+              </button>
+            )}
 
-          <p className="text-slate-400 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed mb-8">
-            Deep static AST analysis, interprocedural taint tracking, and transparent worst-case disaster financial risk models for public repositories.
-          </p>
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label="Toggle navigation menu"
+              className="p-2 rounded-lg border border-slate-200 hover:bg-slate-100 text-slate-700 transition cursor-pointer"
+            >
+              {mobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4 text-slate-800" />}
+            </button>
+          </div>
+        </div>
 
-          {/* CloudVault-Style Command Audit Bar */}
-          <form
-            id="audit-terminal"
-            onSubmit={handleScanSubmit}
-            className="max-w-3xl mx-auto rounded-full bg-[#131620]/90 border border-white/15 p-2 shadow-2xl flex flex-col sm:flex-row items-center gap-2 focus-within:border-[#F09E4F]/70 focus-within:ring-2 focus-within:ring-[#F09E4F]/20 transition-all"
-          >
-            <div className="relative flex-1 w-full pl-3 flex items-center">
-              <Search className="h-4 w-4 text-[#F09E4F] shrink-0" />
+        {/* Mobile Navigation Dropdown Sheet */}
+        {mobileMenuOpen && (
+          <div className="md:hidden pt-3.5 pb-2 border-t border-slate-100 mt-3 flex flex-col gap-2 text-xs animate-in slide-in-from-top-2 duration-150">
+            {/* Quick Links */}
+            <Link
+              href="/blog"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-slate-100 text-slate-700 font-semibold transition"
+            >
+              <div className="flex items-center gap-2">
+                <BookOpen className="h-4 w-4 text-sky-600" />
+                <span>Security Research Blog</span>
+              </div>
+              <ArrowRight className="h-3.5 w-3.5 text-slate-400" />
+            </Link>
+
+            <Link
+              href="/faq"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-slate-100 text-slate-700 font-semibold transition"
+            >
+              <div className="flex items-center gap-2">
+                <HelpCircle className="h-4 w-4 text-sky-600" />
+                <span>Frequently Asked Questions</span>
+              </div>
+              <ArrowRight className="h-3.5 w-3.5 text-slate-400" />
+            </Link>
+
+            {/* Logged in User Section */}
+            {currentUser && (
+              <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 my-1 space-y-2">
+                <div className="flex items-center justify-between pb-2 border-b border-slate-200/70">
+                  <div className="flex items-center gap-2">
+                    <div className="h-7 w-7 rounded-full bg-sky-600 text-white font-bold text-xs flex items-center justify-center font-mono uppercase">
+                      {currentUser.username.substring(0, 2)}
+                    </div>
+                    <div>
+                      <div className="font-bold text-slate-900 font-mono text-xs">{currentUser.username}</div>
+                      <div className="text-[10px] text-slate-500 font-mono">
+                        {currentUser.githubUsername ? `@${currentUser.githubUsername}` : currentUser.role}
+                      </div>
+                    </div>
+                  </div>
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-sky-100 text-sky-800 font-bold">
+                    {currentUser.role}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 gap-1.5">
+                  <button
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      setHistoryModalOpen(true);
+                    }}
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white border border-slate-200 text-slate-700 font-semibold hover:bg-slate-100 transition cursor-pointer text-left"
+                  >
+                    <Clock className="h-3.5 w-3.5 text-sky-600" />
+                    <span>Scan History</span>
+                  </button>
+
+                  {currentUser.role === "ADMIN" && (
+                    <button
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        setAdminModalOpen(true);
+                      }}
+                      className="flex items-center gap-2 px-3 py-2 rounded-lg bg-indigo-50 border border-indigo-200 text-indigo-700 font-bold hover:bg-indigo-100 transition cursor-pointer text-left"
+                    >
+                      <ShieldAlert className="h-3.5 w-3.5 text-indigo-600" />
+                      <span>Admin Control Center</span>
+                    </button>
+                  )}
+
+                  <button
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      setProfileModalOpen(true);
+                    }}
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white border border-slate-200 text-slate-700 font-semibold hover:bg-slate-100 transition cursor-pointer text-left"
+                  >
+                    <Settings className="h-3.5 w-3.5 text-slate-500" />
+                    <span>Profile & Settings</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      handleLogout();
+                    }}
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 font-semibold hover:bg-rose-100 transition cursor-pointer text-left"
+                  >
+                    <LogOut className="h-3.5 w-3.5 text-rose-600" />
+                    <span>Sign Out</span>
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {!currentUser && (
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  setAuthModalOpen(true);
+                }}
+                className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-sky-600 text-white font-semibold shadow-xs cursor-pointer"
+              >
+                <User className="h-3.5 w-3.5" />
+                <span>Sign In / Register</span>
+              </button>
+            )}
+
+            <div className="pt-2 border-t border-slate-100 flex items-center justify-between px-3 py-1 text-[11px] text-slate-500">
+              <span className="flex items-center gap-1.5">
+                <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                Zero-Execution Sandbox Active
+              </span>
+            </div>
+          </div>
+        )}
+      </header>
+
+      {/* ── Hero Search Section ───────────────────────────── */}
+      <section className="bg-gradient-to-b from-white via-sky-50/30 to-slate-50 border-b border-slate-200/90 py-8 sm:py-12 px-4 sm:px-6">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-6 sm:mb-8">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-50 border border-sky-200 text-sky-700 text-xs font-medium mb-3 shadow-2xs">
+              <Zap className="h-3.5 w-3.5 text-sky-600" /> DUAL DEFENSIVE ENGINES · PUBLIC REPOS & SITES
+            </div>
+            <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-slate-900 mb-2">
+              Security Vulnerability & Risk Intelligence
+            </h1>
+            <p className="text-slate-600 text-xs sm:text-sm max-w-xl mx-auto leading-relaxed">
+              Scan any public GitHub repository or web domain for known CVEs, novel logic bugs,
+              and security misconfigurations with concrete remediation diffs.
+            </p>
+          </div>
+
+          {/* Input Box */}
+          <form onSubmit={handleScanSubmit} className="flex flex-col sm:flex-row gap-3 max-w-3xl mx-auto">
+            <div className="relative flex-1">
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <Search className="h-4 w-4 text-slate-400" />
+              </div>
               <input
                 type="text"
                 value={targetUrl}
                 onChange={(e) => setTargetUrl(e.target.value)}
-                placeholder="https://github.com/owner/repo or web domain"
+                placeholder="https://github.com/owner/repo   or   https://example.com"
                 disabled={isLoading}
-                className="w-full pl-3 pr-4 py-2 bg-transparent text-sm text-white placeholder-slate-500 font-mono focus:outline-none disabled:opacity-50"
+                className="w-full pl-11 pr-4 py-3 bg-white border border-slate-300 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-sky-600 focus:ring-2 focus:ring-sky-500/20 font-mono text-slate-900 placeholder:text-slate-400 transition shadow-xs disabled:bg-slate-100"
               />
             </div>
             <button
               type="submit"
               disabled={isLoading || !targetUrl.trim()}
-              className="w-full sm:w-auto px-7 py-3 rounded-full bg-[#F09E4F] hover:bg-[#E08E3F] font-bold text-xs text-slate-950 shadow-lg shadow-[rgba(240,158,79,0.25)] hover:shadow-[0_0_24px_rgba(240,158,79,0.4)] disabled:opacity-50 transition flex items-center justify-center gap-2 cursor-pointer shrink-0"
+              className="w-full sm:w-auto px-6 py-3 rounded-xl bg-sky-600 hover:bg-sky-500 font-semibold text-sm text-white shadow-md shadow-sky-600/20 disabled:opacity-50 transition flex items-center justify-center gap-2 cursor-pointer min-w-[160px]"
             >
               {isLoading ? (
                 <>
-                  <RefreshCw className="h-4 w-4 animate-spin text-slate-950" />
-                  <span>Auditing Target...</span>
+                  <RefreshCw className="h-4 w-4 animate-spin" />
+                  <span>Auditing...</span>
                 </>
               ) : (
                 <>
-                  <Zap className="h-4 w-4 text-slate-950" />
-                  <span>Run Audit</span>
+                  <Shield className="h-4 w-4" />
+                  <span>Start Audit</span>
                 </>
               )}
             </button>
           </form>
 
-          {/* Mac-Style Vault Terminal Card Showcase */}
-          <div className="mt-10 max-w-3xl mx-auto vault-card overflow-hidden text-left border border-white/10 shadow-2xl">
-            {/* macOS Window Title Bar */}
-            <div className="px-4 py-3 bg-[#0E1017]/90 border-b border-white/5 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full mac-dot-red inline-block" />
-                <span className="w-3 h-3 rounded-full mac-dot-yellow inline-block" />
-                <span className="w-3 h-3 rounded-full mac-dot-green inline-block" />
-                <span className="ml-2 font-mono text-[11px] text-slate-400">
-                  cybershield://ast/audit-engine • DUAL ENGINES ACTIVE
-                </span>
-              </div>
-              <div className="flex items-center gap-2 font-mono text-[10px] text-[#64D771] bg-[#64D771]/10 px-2.5 py-0.5 rounded-full border border-[#64D771]/20">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#64D771] animate-pulse" />
-                <span>AES-256 / AST-TAINT VERIFIED</span>
-              </div>
-            </div>
-
-            {/* Terminal Preview Content */}
-            <div className="p-5 font-mono text-xs space-y-3 bg-[#0A0D14]/90">
-              <div className="flex items-center gap-2 text-slate-400">
-                <span className="text-[#F09E4F]">$</span>
-                <span>cybershield audit --target https://github.com/expressjs/express --dual-engine</span>
-              </div>
-              <div className="text-slate-300 pl-4 border-l-2 border-[#F09E4F]/40 space-y-1.5 text-[11px]">
-                <div className="text-[#64D771] flex items-center gap-1.5">
-                  <CheckCircle2 className="w-3.5 h-3.5" />
-                  <span>Stage 1: AST Ingestion & Archive validated (Zero-Execution Sandbox)</span>
-                </div>
-                <div className="text-slate-300 flex items-center gap-1.5">
-                  <Terminal className="w-3.5 h-3.5 text-cyan-400" />
-                  <span>Stage 2: Semgrep & OSV Known CVE Engine: 14 dependency advisories identified</span>
-                </div>
-                <div className="text-[#F09E4F] flex items-center gap-1.5">
-                  <Zap className="w-3.5 h-3.5 text-[#F09E4F]" />
-                  <span>Stage 3: Novel AST Taint Tracker: Traced unescaped sink at router/index.js:142</span>
-                </div>
-                <div className="text-slate-400 flex items-center gap-1.5">
-                  <BarChart3 className="w-3.5 h-3.5 text-rose-400" />
-                  <span>Stage 4: Disaster Exposure Formulation: Worst-Case Exposure estimated at $142,500</span>
-                </div>
-              </div>
-              <div className="pt-2 flex flex-wrap items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setTargetUrl("https://github.com/expressjs/express");
-                    executeScan("https://github.com/expressjs/express");
-                  }}
-                  className="px-3 py-1.5 rounded-full bg-[#F09E4F]/15 hover:bg-[#F09E4F]/25 text-[#F09E4F] border border-[#F09E4F]/30 text-[11px] font-sans font-semibold transition cursor-pointer flex items-center gap-1.5"
-                >
-                  <Zap className="w-3 h-3" />
-                  <span>Live Demo with expressjs/express</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setTargetUrl("https://github.com/lodash/lodash");
-                    executeScan("https://github.com/lodash/lodash");
-                  }}
-                  className="px-3 py-1.5 rounded-full bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 text-[11px] font-sans font-medium transition cursor-pointer"
-                >
-                  Try lodash/lodash
-                </button>
-              </div>
-            </div>
-          </div>
-
           {/* ── User's Connected GitHub Repositories (1-Click Direct Audit) ── */}
           {currentUser?.githubUsername ? (
-            <div className="mt-8 vault-card p-6 shadow-2xl text-left border border-white/10">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-white/10">
-                <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-full bg-white/5 border border-white/10 text-white flex items-center justify-center shrink-0">
-                    <Github className="h-5 w-5 text-[#F09E4F]" />
+            <div className="mt-8 bg-white border border-slate-200/90 rounded-2xl p-5 shadow-xs text-left">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
+                <div className="flex items-center gap-2.5">
+                  <div className="h-9 w-9 rounded-xl bg-slate-900 text-white flex items-center justify-center shadow-xs shrink-0">
+                    <Github className="h-5 w-5" />
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <h3 className="text-sm font-bold text-white">Your GitHub Repositories</h3>
-                      <span className="text-[11px] font-mono px-2 py-0.5 rounded-full bg-[#F09E4F]/10 text-[#F09E4F] border border-[#F09E4F]/30 font-semibold">
+                      <h3 className="text-sm font-bold text-slate-900">Your GitHub Repositories</h3>
+                      <span className="text-[11px] font-mono px-2 py-0.5 rounded-full bg-sky-50 text-sky-700 border border-sky-200 font-semibold">
                         @{currentUser.githubUsername}
                       </span>
                       {userRepos.length > 0 && (
-                        <span className="text-[10px] text-slate-400 font-mono">
+                        <span className="text-[10px] text-slate-500 font-medium">
                           ({userRepos.length} public repos)
                         </span>
                       )}
                     </div>
-                    <p className="text-xs text-slate-400">
+                    <p className="text-xs text-slate-500">
                       Directly audit your public repositories with 1-click. Zero installation, zero execution sandbox.
                     </p>
                   </div>
@@ -715,17 +888,17 @@ export default function CyberShieldLightApp() {
                       placeholder="Filter repos..."
                       value={repoSearchQuery}
                       onChange={(e) => setRepoSearchQuery(e.target.value)}
-                      className="px-3 py-1.5 text-xs border border-white/10 rounded-full text-white bg-white/5 focus:outline-none focus:border-[#F09E4F] placeholder-slate-500 font-mono"
+                      className="px-2.5 py-1 text-xs border border-slate-200 rounded-lg text-slate-800 bg-slate-50 focus:outline-none focus:border-sky-500"
                     />
                   )}
                   <button
                     type="button"
                     onClick={() => fetchUserRepos(currentUser.githubUsername!)}
                     disabled={reposLoading}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-white/10 text-xs text-slate-300 hover:text-white hover:bg-white/10 transition cursor-pointer disabled:opacity-50"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 text-xs text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition cursor-pointer disabled:opacity-50"
                     title="Refresh repositories list"
                   >
-                    <RefreshCw className={`h-3 w-3 ${reposLoading ? "animate-spin text-[#F09E4F]" : ""}`} />
+                    <RefreshCw className={`h-3 w-3 ${reposLoading ? "animate-spin" : ""}`} />
                     <span>Refresh</span>
                   </button>
                 </div>
@@ -735,29 +908,29 @@ export default function CyberShieldLightApp() {
               {reposLoading ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 pt-4">
                   {[1, 2, 3].map((n) => (
-                    <div key={n} className="p-3.5 border border-white/10 rounded-xl animate-pulse bg-white/5 space-y-2">
-                      <div className="h-4 bg-white/10 rounded w-3/4" />
-                      <div className="h-3 bg-white/10 rounded w-5/6" />
+                    <div key={n} className="p-3.5 border border-slate-200 rounded-xl animate-pulse bg-slate-50/50 space-y-2">
+                      <div className="h-4 bg-slate-200 rounded w-3/4" />
+                      <div className="h-3 bg-slate-200 rounded w-5/6" />
                       <div className="flex justify-between items-center pt-2">
-                        <div className="h-3 bg-white/10 rounded w-1/4" />
-                        <div className="h-6 bg-white/10 rounded w-20" />
+                        <div className="h-3 bg-slate-200 rounded w-1/4" />
+                        <div className="h-6 bg-slate-200 rounded w-20" />
                       </div>
                     </div>
                   ))}
                 </div>
               ) : reposError ? (
                 <div className="pt-4 text-center py-6">
-                  <p className="text-xs text-rose-400 mb-2">{reposError}</p>
+                  <p className="text-xs text-rose-600 mb-2">{reposError}</p>
                   <button
                     type="button"
                     onClick={() => fetchUserRepos(currentUser.githubUsername!)}
-                    className="text-xs font-semibold text-[#F09E4F] hover:underline cursor-pointer"
+                    className="text-xs font-semibold text-sky-600 hover:underline cursor-pointer"
                   >
                     Try fetching repositories again
                   </button>
                 </div>
               ) : userRepos.length === 0 ? (
-                <div className="pt-4 text-center py-6 text-xs text-slate-400">
+                <div className="pt-4 text-center py-6 text-xs text-slate-500">
                   No public repositories found for @{currentUser.githubUsername}.
                 </div>
               ) : (
@@ -774,38 +947,37 @@ export default function CyberShieldLightApp() {
                       return (
                         <div
                           key={repo.id}
-                          className="vault-card p-4 flex flex-col justify-between transition-all hover:border-[#F09E4F]/50 group bg-[#0E111A]/80 border border-white/10"
+                          className="bg-white border border-slate-200 hover:border-sky-300 rounded-xl p-3.5 shadow-2xs flex flex-col justify-between transition hover:shadow-xs group"
                         >
                           <div>
-                            <div className="flex items-start justify-between gap-1 mb-1.5">
-                              <span className="font-semibold text-xs text-white group-hover:text-[#F09E4F] transition truncate" title={repo.fullName}>
+                            <div className="flex items-start justify-between gap-1 mb-1">
+                              <span className="font-semibold text-xs text-slate-900 group-hover:text-sky-600 transition truncate" title={repo.fullName}>
                                 {repo.name}
                               </span>
                               <a
                                 href={repo.htmlUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-slate-500 hover:text-slate-300 transition p-0.5"
+                                className="text-slate-400 hover:text-slate-700 transition p-0.5"
                                 title="Open repository in GitHub"
                               >
                                 <ExternalLink className="h-3 w-3" />
                               </a>
                             </div>
 
-                            <p className="text-[11px] text-slate-400 line-clamp-2 mb-3 min-h-[30px]" title={repo.description || "No description"}>
+                            <p className="text-[11px] text-slate-500 line-clamp-2 mb-2 min-h-[30px]" title={repo.description || "No description"}>
                               {repo.description || "No description provided"}
                             </p>
                           </div>
 
-                          <div className="pt-2 border-t border-white/5 flex items-center justify-between mt-auto">
-                            <div className="flex items-center gap-2 text-[10px] text-slate-400 font-mono">
+                          <div className="pt-2 border-t border-slate-100 flex items-center justify-between mt-auto">
+                            <div className="flex items-center gap-2 text-[10px] text-slate-500">
                               {repo.language && (
-                                <span className="flex items-center gap-1">
-                                  <span className="h-1.5 w-1.5 rounded-full bg-[#F09E4F]" />
-                                  <span>{repo.language}</span>
+                                <span className="font-medium px-1.5 py-0.5 rounded bg-slate-100 text-slate-700">
+                                  {repo.language}
                                 </span>
                               )}
-                              <span className="flex items-center gap-0.5 text-slate-500">
+                              <span className="flex items-center gap-0.5 text-slate-400">
                                 ★ {repo.stars}
                               </span>
                             </div>
@@ -814,20 +986,20 @@ export default function CyberShieldLightApp() {
                               type="button"
                               onClick={() => executeScan(repo.htmlUrl)}
                               disabled={isLoading}
-                              className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition cursor-pointer ${
+                              className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold shadow-xs transition cursor-pointer ${
                                 isCurrentAuditing
-                                  ? "bg-[#F09E4F]/20 text-[#F09E4F] border border-[#F09E4F]/40 animate-pulse"
-                                  : "bg-[#F09E4F] hover:bg-[#E08E3F] text-slate-950 shadow-md shadow-[rgba(240,158,79,0.25)]"
+                                  ? "bg-sky-100 text-sky-700 border border-sky-300"
+                                  : "bg-sky-600 hover:bg-sky-500 text-white"
                               } disabled:opacity-50`}
                             >
                               {isCurrentAuditing ? (
                                 <>
-                                  <RefreshCw className="h-3 w-3 animate-spin text-[#F09E4F]" />
+                                  <RefreshCw className="h-3 w-3 animate-spin" />
                                   <span>Auditing...</span>
                                 </>
                               ) : (
                                 <>
-                                  <Zap className="h-3 w-3 text-slate-950" />
+                                  <Zap className="h-3 w-3 text-amber-300" />
                                   <span>1-Click Audit</span>
                                 </>
                               )}
@@ -840,13 +1012,13 @@ export default function CyberShieldLightApp() {
               )}
             </div>
           ) : !currentUser ? (
-            <div className="mt-6 text-center">
+            <div className="mt-4 text-center">
               <button
                 type="button"
                 onClick={() => setAuthModalOpen(true)}
-                className="inline-flex items-center gap-2 text-xs text-slate-400 hover:text-white transition cursor-pointer px-4 py-2 rounded-full bg-white/5 border border-white/10 hover:border-[#F09E4F]/40"
+                className="inline-flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-800 transition cursor-pointer"
               >
-                <Github className="h-3.5 w-3.5 text-[#F09E4F]" />
+                <Github className="h-3.5 w-3.5" />
                 <span>Sign in with GitHub to view and 1-click audit all your personal repositories</span>
               </button>
             </div>
@@ -935,19 +1107,19 @@ export default function CyberShieldLightApp() {
       {/* ── 1. Empty State — "Nothing saved yet." Explain why and give next steps ── */}
       {scanStage === "IDLE" && !report && !isLoading && (
         <div className="flex-1 flex flex-col items-center justify-center py-16 px-6">
-          <div className="h-16 w-16 rounded-2xl bg-[#131620] border border-white/10 flex items-center justify-center mb-4 text-[#F09E4F] shadow-lg shadow-[rgba(240,158,79,0.15)]">
-            <Shield className="h-8 w-8 text-[#F09E4F]" />
+          <div className="h-16 w-16 rounded-2xl bg-sky-50 border border-sky-200 flex items-center justify-center mb-4 text-sky-600 shadow-sm">
+            <Shield className="h-8 w-8" />
           </div>
-          <h2 className="text-2xl font-black text-white mb-2">Nothing saved yet.</h2>
-          <p className="text-sm text-slate-400 text-center max-w-lg mb-8 leading-relaxed">
+          <h2 className="text-xl font-extrabold text-slate-900 mb-1">Nothing saved yet.</h2>
+          <p className="text-sm text-slate-600 text-center max-w-lg mb-8 leading-relaxed">
             You haven’t run any repository or website security audits yet. Paste any public GitHub repo URL or domain name above, or click one of the verified open-source targets below to see the platform in action.
           </p>
 
-          <div className="text-xs font-mono font-bold uppercase tracking-wider text-[#F09E4F] mb-4">
+          <div className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">
             Recommended Next Step: Choose a Target to Audit
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-4xl w-full">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl w-full">
             {[
               {
                 title: "expressjs/express",
@@ -955,7 +1127,7 @@ export default function CyberShieldLightApp() {
                 desc: "Discover real SQLi, path traversal and novel AST logic flaws in seconds.",
                 url: "https://github.com/expressjs/express",
                 badge: "High Severity",
-                badgeCls: "bg-rose-500/10 text-rose-400 border-rose-500/30",
+                badgeCls: "bg-orange-50 text-orange-700 border-orange-200",
               },
               {
                 title: "https://example.com",
@@ -963,7 +1135,7 @@ export default function CyberShieldLightApp() {
                 desc: "Audit CSP headers, HSTS enforcement, and server banner leakages.",
                 url: "https://example.com",
                 badge: "Perimeter",
-                badgeCls: "bg-amber-500/10 text-amber-400 border-amber-500/30",
+                badgeCls: "bg-amber-50 text-amber-700 border-amber-200",
               },
               {
                 title: "octocat/Hello-World",
@@ -971,30 +1143,30 @@ export default function CyberShieldLightApp() {
                 desc: "Demonstrate a zero-risk clean repository baseline with $0 exposure.",
                 url: "https://github.com/octocat/Hello-World",
                 badge: "Zero Risk",
-                badgeCls: "bg-[#64D771]/10 text-[#64D771] border-[#64D771]/30",
+                badgeCls: "bg-emerald-50 text-emerald-700 border-emerald-200",
               },
             ].map((sample) => (
               <button
                 key={sample.title}
                 type="button"
                 onClick={() => setTargetUrl(sample.url)}
-                className="vault-card p-5 flex flex-col gap-3 text-left transition-all hover:border-[#F09E4F]/50 cursor-pointer group"
+                className="bg-white hover:bg-sky-50/40 border border-slate-200 hover:border-sky-300 rounded-xl p-5 shadow-xs flex flex-col gap-2.5 text-left transition cursor-pointer group"
               >
                 <div className="flex items-center justify-between">
-                  <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold border ${sample.badgeCls}`}>
+                  <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold border ${sample.badgeCls}`}>
                     {sample.badge}
                   </span>
-                  <span className="text-[11px] font-semibold text-[#F09E4F] group-hover:translate-x-1 transition-transform flex items-center gap-1">
+                  <span className="text-[11px] font-semibold text-sky-600 group-hover:translate-x-0.5 transition-transform flex items-center gap-0.5">
                     Select target &rarr;
                   </span>
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-white group-hover:text-[#F09E4F] transition font-mono">
+                  <h3 className="text-sm font-bold text-slate-900 group-hover:text-sky-700 transition font-mono">
                     {sample.title}
                   </h3>
-                  <span className="text-[10px] font-mono text-slate-500">{sample.type}</span>
+                  <span className="text-[10px] font-mono text-slate-400">{sample.type}</span>
                 </div>
-                <p className="text-xs text-slate-400 leading-relaxed">{sample.desc}</p>
+                <p className="text-xs text-slate-600 leading-relaxed">{sample.desc}</p>
               </button>
             ))}
           </div>
@@ -1211,18 +1383,18 @@ export default function CyberShieldLightApp() {
             </div>
 
             {/* Filter and Count Bar */}
-            <div className="flex flex-wrap items-center justify-between gap-3 px-6 py-3 border-b border-slate-200 bg-white">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 sm:px-6 py-3 border-b border-slate-200 bg-white">
               <div className="flex items-center gap-2 text-xs text-slate-600 font-medium">
                 <TrendingUp className="h-3.5 w-3.5 text-sky-600" />
                 <span>
                   Showing <strong className="text-slate-900 font-bold">{filteredFindings.length}</strong> findings
                 </span>
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-2 w-full sm:w-auto">
                 <select
                   value={filterSeverity}
                   onChange={(e) => setFilterSeverity(e.target.value)}
-                  className="bg-slate-50 border border-slate-200 text-slate-700 text-xs font-medium rounded-lg px-2.5 py-1.5 cursor-pointer focus:outline-none focus:border-sky-600"
+                  className="flex-1 sm:flex-initial bg-slate-50 border border-slate-200 text-slate-700 text-xs font-medium rounded-lg px-2.5 py-1.5 cursor-pointer focus:outline-none focus:border-sky-600"
                 >
                   <option value="ALL">All Severities</option>
                   <option value="CRITICAL">Critical</option>
@@ -1234,7 +1406,7 @@ export default function CyberShieldLightApp() {
                 <select
                   value={filterEngine}
                   onChange={(e) => setFilterEngine(e.target.value)}
-                  className="bg-slate-50 border border-slate-200 text-slate-700 text-xs font-medium rounded-lg px-2.5 py-1.5 cursor-pointer focus:outline-none focus:border-sky-600"
+                  className="flex-1 sm:flex-initial bg-slate-50 border border-slate-200 text-slate-700 text-xs font-medium rounded-lg px-2.5 py-1.5 cursor-pointer focus:outline-none focus:border-sky-600"
                 >
                   <option value="ALL">All Engines</option>
                   <option value="KNOWN_VULNERABILITY">Engine 1 – SAST</option>
@@ -1246,7 +1418,7 @@ export default function CyberShieldLightApp() {
             {/* Table */}
             {filteredFindings.length > 0 ? (
               <div className="overflow-x-auto">
-                <table className="w-full text-left">
+                <table className="w-full text-left min-w-[640px]">
                   <thead>
                     <tr className="border-b border-slate-200 bg-slate-50 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                       <th className="px-4 py-3 w-8" />
@@ -1276,7 +1448,7 @@ export default function CyberShieldLightApp() {
 
           {/* ── Disaster Impact Model Panel ──────────────────── */}
           <div className="bg-white border border-slate-200 rounded-2xl shadow-xs overflow-hidden">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between px-6 py-4 border-b border-slate-200 gap-2">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between px-4 sm:px-6 py-4 border-b border-slate-200 gap-2">
               <div className="flex items-center gap-2">
                 <Sliders className="h-4 w-4 text-sky-600" />
                 <h3 className="text-sm font-bold text-slate-900">
@@ -1290,22 +1462,22 @@ export default function CyberShieldLightApp() {
             </div>
 
             {/* Three Scenario Columns */}
-            <div className="grid grid-cols-3 divide-x divide-slate-200 border-b border-slate-200 bg-slate-50/50">
-              <div className="flex flex-col items-center py-5 px-4 text-center">
+            <div className="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-slate-200 border-b border-slate-200 bg-slate-50/50">
+              <div className="flex flex-col items-center py-4 sm:py-5 px-4 text-center">
                 <span className="text-xs font-semibold text-slate-500 mb-1">Conservative (35th)</span>
                 <span className="text-2xl font-black text-sky-700">
                   ${lowCost.toLocaleString()}
                 </span>
                 <span className="text-[10px] text-slate-400 font-mono mt-0.5">Low blast radius</span>
               </div>
-              <div className="flex flex-col items-center py-5 px-4 text-center bg-amber-50/40">
+              <div className="flex flex-col items-center py-4 sm:py-5 px-4 text-center bg-amber-50/40">
                 <span className="text-xs font-bold text-amber-800 mb-1">Expected Baseline</span>
                 <span className="text-2xl font-black text-amber-700">
                   ${estimatedCost.toLocaleString()}
                 </span>
                 <span className="text-[10px] text-amber-700 font-mono mt-0.5">Median industry loss</span>
               </div>
-              <div className="flex flex-col items-center py-5 px-4 text-center">
+              <div className="flex flex-col items-center py-4 sm:py-5 px-4 text-center">
                 <span className="text-xs font-semibold text-slate-500 mb-1">Worst-Case (220th)</span>
                 <span className="text-2xl font-black text-rose-700">
                   ${worstCost.toLocaleString()}
@@ -1315,7 +1487,7 @@ export default function CyberShieldLightApp() {
             </div>
 
             {/* Sliders Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 p-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 p-4 sm:p-6">
               {[
                 {
                   label: "Records Exposed",
@@ -1378,7 +1550,7 @@ export default function CyberShieldLightApp() {
             </div>
 
             {/* Breakdown summary */}
-            <div className="border-t border-slate-200 px-6 py-3.5 bg-slate-50 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-mono font-medium text-slate-600">
+            <div className="border-t border-slate-200 px-4 sm:px-6 py-3.5 bg-slate-50 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-mono font-medium text-slate-600">
               <div>Records loss: <strong className="text-slate-900">${recordsLoss.toLocaleString()}</strong></div>
               <div>Outage loss: <strong className="text-slate-900">${outageLoss.toLocaleString()}</strong></div>
               <div>IR cost: <strong className="text-slate-900">${incidentResponseCost.toLocaleString()}</strong></div>
@@ -1387,12 +1559,6 @@ export default function CyberShieldLightApp() {
           </div>
         </main>
       )}
-
-      {/* ── Footer ────────────────────────────────────────── */}
-      <footer className="border-t border-slate-200 bg-white py-4 px-6 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 font-medium gap-2 mt-auto">
-        <span>CyberShield · Defensive Cybersecurity Platform</span>
-        <span>Zero-Execution Sandbox · Public Targets Only · No Exploit Generation</span>
-      </footer>
 
       {/* ── Modals ────────────────────────────────────────── */}
       <AuthModal

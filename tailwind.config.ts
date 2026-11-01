@@ -15,16 +15,6 @@ const config: Config = {
           surface: "#0F172A",
           elevated: "#1E293B",
         },
-        cyber: {
-          amber: "#F09E4F",
-          "amber-hover": "#E08E3F",
-          emerald: "#64D771",
-          dark: "#0A0D14",
-          surface: "#131620",
-          "surface-elevated": "#1A1D2B",
-          "surface-border": "rgba(255, 255, 255, 0.08)",
-          glass: "rgba(19, 22, 32, 0.75)",
-        },
         brand: {
           cyan: "#06B6D4",
           indigo: "#6366F1",
@@ -41,10 +31,6 @@ const config: Config = {
           subtle: "#1E293B",
           hover: "#334155",
         }
-      },
-      boxShadow: {
-        "glow-amber": "0 0 24px rgba(240, 158, 79, 0.25)",
-        "glow-emerald": "0 0 24px rgba(100, 215, 113, 0.25)",
       },
       fontFamily: {
         sans: ["Inter", "system-ui", "-apple-system", "sans-serif"],

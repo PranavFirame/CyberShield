@@ -45,16 +45,4 @@ describe("Blog & Articles Engine", () => {
     expect(appSecArticles.length).toBeGreaterThan(0);
     expect(appSecArticles.every((a) => a.category === "Application Security")).toBe(true);
   });
-
-  it("blog templates contain CloudVault vault-card and amber styling", async () => {
-    const fs = await import("fs");
-    const path = await import("path");
-    const blogIndex = fs.readFileSync(path.resolve(__dirname, "../app/blog/page.tsx"), "utf-8");
-    const blogSlug = fs.readFileSync(path.resolve(__dirname, "../app/blog/[slug]/page.tsx"), "utf-8");
-
-    expect(blogIndex).toContain("vault-card");
-    expect(blogIndex).toContain("#F09E4F");
-    expect(blogSlug).toContain("vault-card");
-    expect(blogSlug).toContain("#F09E4F");
-  });
 });

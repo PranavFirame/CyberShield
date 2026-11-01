@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowLeft, Cookie } from "lucide-react";
+import PublicNavbar from "@/components/PublicNavbar";
 
 export const metadata = {
   title: "Cookie & Tracking Policy | CyberShield",
@@ -9,6 +10,7 @@ export const metadata = {
 export default function CookiePolicyPage() {
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-slate-900 flex flex-col">
+      <PublicNavbar />
       <div className="bg-white border-b border-slate-200 py-10 px-4 sm:px-6">
         <div className="max-w-4xl mx-auto">
           <Link

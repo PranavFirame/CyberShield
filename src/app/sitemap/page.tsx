@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { prisma, ensureContentSeeded } from "@/lib/db";
 import { Shield, Globe, BookOpen, HelpCircle, FileText, Lock, ArrowRight } from "lucide-react";
+import PublicNavbar from "@/components/PublicNavbar";
 
 export const dynamic = "force-dynamic";
 
@@ -29,6 +30,7 @@ export default async function HtmlSitemapPage() {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-slate-900 flex flex-col">
+      <PublicNavbar />
       {/* Header */}
       <div className="bg-gradient-to-b from-white via-sky-50/20 to-slate-50 border-b border-slate-200 py-10 px-4 sm:px-6">
         <div className="max-w-4xl mx-auto">

@@ -115,15 +115,15 @@ export default function ProfileModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4">
-      <div className="bg-white border border-slate-200 rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-3 sm:p-4">
+      <div className="bg-white border border-slate-200 rounded-2xl shadow-2xl max-w-md w-full max-h-[92vh] sm:max-h-[85vh] overflow-y-auto">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-slate-50/50 sticky top-0 z-10">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-3.5 sm:py-4 border-b border-slate-200 bg-slate-50/50 sticky top-0 z-10">
           <div className="flex items-center gap-2">
             <User className="h-5 w-5 text-sky-600" />
             <div>
               <h3 className="text-sm font-bold text-slate-900">User Settings & Security</h3>
-              <p className="text-[11px] text-slate-500">Manage credentials and profile controls</p>
+              <p className="text-[10px] sm:text-[11px] text-slate-500">Manage credentials and profile controls</p>
             </div>
           </div>
           <button
@@ -134,7 +134,7 @@ export default function ProfileModal({
           </button>
         </div>
 
-        <div className="p-6 flex flex-col gap-6">
+        <div className="p-4 sm:p-6 flex flex-col gap-5 sm:gap-6">
           {msg && (
             <div
               className={`p-3 rounded-xl text-xs flex items-center gap-2 ${
@@ -168,7 +168,7 @@ export default function ProfileModal({
             <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
               <User className="h-3.5 w-3.5 text-slate-400" /> Change Username
             </h4>
-            <div className="flex gap-2">
+            <div className="flex flex-col sm:flex-row gap-2">
               <input
                 type="text"
                 required
@@ -179,7 +179,7 @@ export default function ProfileModal({
               <button
                 type="submit"
                 disabled={usernameLoading || newUsername === user.username}
-                className="px-4 py-2 bg-sky-600 hover:bg-sky-500 font-semibold text-xs text-white rounded-xl disabled:opacity-40 transition cursor-pointer"
+                className="w-full sm:w-auto px-4 py-2 bg-sky-600 hover:bg-sky-500 font-semibold text-xs text-white rounded-xl disabled:opacity-40 transition cursor-pointer"
               >
                 {usernameLoading ? "Updating..." : "Save Username"}
               </button>
