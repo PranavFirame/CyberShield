@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useRef, useEffect } from "react";
+import Link from "next/link";
 import {
   Shield,
   Search,
@@ -33,6 +34,8 @@ import {
   ShieldAlert,
   Download,
   Github,
+  BookOpen,
+  HelpCircle,
 } from "lucide-react";
 import { Finding, ScanReport } from "@/types/security";
 import { exportReportToPdf } from "@/lib/pdf-generator";
@@ -553,7 +556,25 @@ export default function CyberShieldLightApp() {
         </div>
 
         <div className="flex items-center gap-2.5 text-xs">
-          <div className="hidden lg:flex items-center gap-1.5 text-slate-500 border border-slate-200 bg-slate-50 px-3 py-1.5 rounded-full font-medium shadow-2xs">
+          {/* Navigation Links */}
+          <nav className="hidden md:flex items-center gap-1 font-semibold text-slate-600 mr-1">
+            <Link
+              href="/blog"
+              className="px-2.5 py-1.5 rounded-lg hover:text-slate-900 hover:bg-slate-100 transition flex items-center gap-1"
+            >
+              <BookOpen className="h-3.5 w-3.5 text-sky-600" />
+              <span>Blog</span>
+            </Link>
+            <Link
+              href="/faq"
+              className="px-2.5 py-1.5 rounded-lg hover:text-slate-900 hover:bg-slate-100 transition flex items-center gap-1"
+            >
+              <HelpCircle className="h-3.5 w-3.5 text-sky-600" />
+              <span>FAQ</span>
+            </Link>
+          </nav>
+
+          <div className="hidden xl:flex items-center gap-1.5 text-slate-500 border border-slate-200 bg-slate-50 px-3 py-1.5 rounded-full font-medium shadow-2xs">
             <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
             Zero-Execution Sandbox Active
           </div>
