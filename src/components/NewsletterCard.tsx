@@ -17,13 +17,21 @@ export default function NewsletterCard({
   description = "Join 14,000+ engineers receiving curated zero-day analyses, AST vulnerability breakdowns, and open-source security alerts monthly. Zero spam.",
 }: NewsletterCardProps) {
   const [email, setEmail] = useState("");
-  const [consent, setConsent] = useState(true);
+  const [consent, setConsent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ text: string; type: "success" | "error" } | null>(null);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!email) return;
+
+    if (!consent) {
+      setMessage({
+        text: "Please check the box to confirm you agree to receive security digests.",
+        type: "error",
+      });
+      return;
+    }
 
     setLoading(true);
     setMessage(null);
@@ -42,6 +50,7 @@ export default function NewsletterCard({
 
       setMessage({ text: data.message || "Subscribed successfully!", type: "success" });
       setEmail("");
+      setConsent(false);
     } catch (err: unknown) {
       setMessage({
         text: err instanceof Error ? err.message : "Something went wrong. Please try again.",
