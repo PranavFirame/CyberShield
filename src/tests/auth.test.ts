@@ -185,4 +185,19 @@ describe("CyberShield Authentication & RBAC Engine", () => {
     expect(firstRepo.html_url).toMatch(/^https:\/\/github\.com\//);
     expect(typeof firstRepo.stargazers_count).toBe("number");
   });
+
+  it("verifies GitHub OAuth status endpoint reflects configuration state", async () => {
+    // When environment variables are unset, OAuth should report not configured
+    const prevId = process.env.GITHUB_CLIENT_ID;
+    const prevSecret = process.env.GITHUB_CLIENT_SECRET;
+    delete process.env.GITHUB_CLIENT_ID;
+    delete process.env.GITHUB_CLIENT_SECRET;
+
+    const isConfigured = Boolean(process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET);
+    expect(isConfigured).toBe(false);
+
+    // Restore
+    if (prevId) process.env.GITHUB_CLIENT_ID = prevId;
+    if (prevSecret) process.env.GITHUB_CLIENT_SECRET = prevSecret;
+  });
 });

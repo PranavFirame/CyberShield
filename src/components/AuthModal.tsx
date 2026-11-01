@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Shield, Lock, User, Github, AlertCircle, X, Check, ArrowRight } from "lucide-react";
+import { Shield, Lock, User, Github, AlertCircle, X, ArrowRight, ExternalLink } from "lucide-react";
 
 interface AuthUser {
   id: string;
@@ -22,7 +22,6 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
-  const [githubHandle, setGithubHandle] = useState("pranavfirame");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -74,31 +73,25 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
     }
   }
 
-  async function handleGithubAuth(e?: React.FormEvent) {
-    if (e) e.preventDefault();
-    const handle = githubHandle.trim().replace(/^@/, "");
-    if (!handle) {
-      setError("Please enter your GitHub username");
-      return;
-    }
-
+  async function handleInitiateGithubOAuth() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/auth/github", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ githubUsername: handle }),
-      });
+      const res = await fetch("/api/auth/github/status");
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "GitHub authentication failed");
+      if (!data.configured) {
+        setError(
+          "GitHub OAuth requires GITHUB_CLIENT_ID and GITHUB_CLIENT_SECRET in .env.local. Register an OAuth App in GitHub Developer Settings with callback URL: " +
+            data.callbackUrl
+        );
+        setLoading(false);
+        return;
+      }
 
-      onSuccess(data.user);
-      onClose();
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "GitHub authentication failed");
-    } finally {
-      setLoading(false);
+      // Redirect directly to official GitHub OAuth 2.0 authorization
+      window.location.href = "/api/auth/github";
+    } catch {
+      window.location.href = "/api/auth/github";
     }
   }
 
@@ -163,7 +156,22 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
           {error && (
             <div className="mb-4 p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700 flex items-start gap-2">
               <AlertCircle className="h-4 w-4 shrink-0 mt-0.5 text-rose-600" />
-              <span>{error}</span>
+              <div className="space-y-1">
+                <span>{error}</span>
+                {tab === "GITHUB" && (
+                  <div className="pt-1">
+                    <a
+                      href="https://github.com/settings/developers"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sky-700 font-semibold hover:underline inline-flex items-center gap-1 text-[11px]"
+                    >
+                      <span>Open GitHub Developer Settings</span>
+                      <ExternalLink className="h-3 w-3" />
+                    </a>
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
@@ -257,61 +265,30 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
           )}
 
           {tab === "GITHUB" && (
-            <form onSubmit={handleGithubAuth} className="flex flex-col py-2">
-              <div className="flex flex-col items-center text-center mb-4">
-                <div className="h-12 w-12 rounded-2xl bg-slate-900 text-white flex items-center justify-center mb-2 shadow-md">
-                  <Github className="h-7 w-7" />
-                </div>
-                <h4 className="text-sm font-bold text-slate-800">GitHub Single Sign-On</h4>
-                <p className="text-xs text-slate-500 max-w-xs mt-1">
-                  Authenticate with your GitHub handle to sync all your public repositories and run 1-click defensive audits.
-                </p>
+            <div className="flex flex-col items-center py-4 text-center">
+              <div className="h-14 w-14 rounded-2xl bg-slate-900 text-white flex items-center justify-center mb-3 shadow-md">
+                <Github className="h-8 w-8" />
               </div>
-
-              <div className="mb-4">
-                <label className="text-xs font-semibold text-slate-700 mb-1 block">GitHub Handle / Username</label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 font-mono text-xs">
-                    @
-                  </div>
-                  <input
-                    type="text"
-                    required
-                    value={githubHandle}
-                    onChange={(e) => setGithubHandle(e.target.value)}
-                    placeholder="e.g. pranavfirame or octocat"
-                    className="w-full pl-8 pr-3 py-2.5 text-xs bg-slate-50 border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:border-sky-600 focus:ring-1 focus:ring-sky-600 font-mono"
-                  />
-                </div>
-                <div className="flex items-center gap-2 mt-2">
-                  <span className="text-[11px] text-slate-400">Quick handles:</span>
-                  <button
-                    type="button"
-                    onClick={() => setGithubHandle("pranavfirame")}
-                    className="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 transition cursor-pointer"
-                  >
-                    pranavfirame
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setGithubHandle("octocat")}
-                    className="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 transition cursor-pointer"
-                  >
-                    octocat
-                  </button>
-                </div>
-              </div>
+              <h4 className="text-base font-bold text-slate-900">GitHub Single Sign-On</h4>
+              <p className="text-xs text-slate-500 max-w-sm mt-1.5 leading-relaxed">
+                Authenticate securely using official GitHub OAuth 2.0. CyberShield verifies your identity directly with GitHub to sync and 1-click audit your repositories.
+              </p>
 
               <button
-                type="submit"
-                disabled={loading || !githubHandle.trim()}
-                className="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 font-semibold text-xs text-white shadow-md shadow-slate-900/20 transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                type="button"
+                onClick={handleInitiateGithubOAuth}
+                disabled={loading}
+                className="mt-6 w-full py-3 rounded-xl bg-slate-900 hover:bg-slate-800 font-semibold text-xs text-white shadow-md shadow-slate-900/20 transition flex items-center justify-center gap-2.5 cursor-pointer disabled:opacity-50"
               >
                 <Github className="h-4 w-4" />
-                {loading ? "Connecting to GitHub..." : "Continue with GitHub"}
+                <span>{loading ? "Connecting to GitHub..." : "Sign in with GitHub"}</span>
                 <ArrowRight className="h-3.5 w-3.5" />
               </button>
-            </form>
+
+              <p className="text-[11px] text-slate-400 mt-4 max-w-xs leading-normal">
+                You will be redirected to GitHub to authorize CyberShield. We request read-only access to your public repositories.
+              </p>
+            </div>
           )}
         </div>
       </div>
