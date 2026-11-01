@@ -553,55 +553,134 @@ export default function CyberShieldLightApp() {
         }}
       />
 
-      {/* ── Hero Search Section ───────────────────────────── */}
-      <section className="bg-gradient-to-b from-white via-sky-50/30 to-slate-50 border-b border-slate-200/90 py-12 px-6">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-50 border border-sky-200 text-sky-700 text-xs font-medium mb-3 shadow-2xs">
-              <Zap className="h-3.5 w-3.5 text-sky-600" /> DUAL DEFENSIVE ENGINES · PUBLIC REPOS & SITES
-            </div>
-            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 mb-2">
-              Security Vulnerability & Risk Intelligence
-            </h1>
-            <p className="text-slate-600 text-sm max-w-xl mx-auto">
-              Scan any public GitHub repository or web domain for known CVEs, novel logic bugs,
-              and security misconfigurations with concrete remediation diffs.
-            </p>
+      {/* ── Hero Search Section (CloudVault Inspired) ──────────────── */}
+      <section className="relative overflow-hidden bg-gradient-to-b from-[#0A0D14] via-[#0E111A] to-[#131620] border-b border-white/10 py-16 px-6">
+        {/* Subtle Ambient Glow */}
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96 bg-[#F09E4F]/10 rounded-full blur-3xl pointer-events-none -z-0" />
+
+        <div className="relative z-10 max-w-4xl mx-auto text-center">
+          {/* Live Status Pill with Emerald Pulse */}
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#131620]/90 border border-white/10 text-xs font-mono text-slate-300 shadow-lg mb-6">
+            <span className="w-2 h-2 rounded-full bg-[#64D771] animate-pulse" />
+            <span className="text-[#64D771] font-semibold">Zero-Execution AST Sandbox Active</span>
+            <span className="text-slate-600 hidden sm:inline">•</span>
+            <span className="text-slate-400 hidden sm:inline">Defensive Code Intelligence</span>
           </div>
 
-          {/* Input Box */}
-          <form onSubmit={handleScanSubmit} className="flex flex-col sm:flex-row gap-3 max-w-3xl mx-auto">
-            <div className="relative flex-1">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <Search className="h-4 w-4 text-slate-400" />
-              </div>
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white mb-4 leading-tight">
+            Your code. Your vulnerabilities.{" "}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#F09E4F] via-[#FFA85C] to-[#E08E3F] drop-shadow-[0_0_24px_rgba(240,158,79,0.35)]">
+              Your shield.
+            </span>
+          </h1>
+
+          <p className="text-slate-400 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed mb-8">
+            Deep static AST analysis, interprocedural taint tracking, and transparent worst-case disaster financial risk models for public repositories.
+          </p>
+
+          {/* CloudVault-Style Command Audit Bar */}
+          <form
+            id="audit-terminal"
+            onSubmit={handleScanSubmit}
+            className="max-w-3xl mx-auto rounded-full bg-[#131620]/90 border border-white/15 p-2 shadow-2xl flex flex-col sm:flex-row items-center gap-2 focus-within:border-[#F09E4F]/70 focus-within:ring-2 focus-within:ring-[#F09E4F]/20 transition-all"
+          >
+            <div className="relative flex-1 w-full pl-3 flex items-center">
+              <Search className="h-4 w-4 text-[#F09E4F] shrink-0" />
               <input
                 type="text"
                 value={targetUrl}
                 onChange={(e) => setTargetUrl(e.target.value)}
-                placeholder="https://github.com/owner/repo   or   https://example.com"
+                placeholder="https://github.com/owner/repo or web domain"
                 disabled={isLoading}
-                className="w-full pl-11 pr-4 py-3 bg-white border border-slate-300 rounded-xl text-sm focus:outline-none focus:border-sky-600 focus:ring-2 focus:ring-sky-500/20 font-mono text-slate-900 placeholder:text-slate-400 transition shadow-xs disabled:bg-slate-100"
+                className="w-full pl-3 pr-4 py-2 bg-transparent text-sm text-white placeholder-slate-500 font-mono focus:outline-none disabled:opacity-50"
               />
             </div>
             <button
               type="submit"
               disabled={isLoading || !targetUrl.trim()}
-              className="px-6 py-3 rounded-xl bg-sky-600 hover:bg-sky-500 font-semibold text-sm text-white shadow-md shadow-sky-600/20 disabled:opacity-50 transition flex items-center justify-center gap-2 cursor-pointer min-w-[170px]"
+              className="w-full sm:w-auto px-7 py-3 rounded-full bg-[#F09E4F] hover:bg-[#E08E3F] font-bold text-xs text-slate-950 shadow-lg shadow-[rgba(240,158,79,0.25)] hover:shadow-[0_0_24px_rgba(240,158,79,0.4)] disabled:opacity-50 transition flex items-center justify-center gap-2 cursor-pointer shrink-0"
             >
               {isLoading ? (
                 <>
-                  <RefreshCw className="h-4 w-4 animate-spin" />
-                  <span>Auditing...</span>
+                  <RefreshCw className="h-4 w-4 animate-spin text-slate-950" />
+                  <span>Auditing Target...</span>
                 </>
               ) : (
                 <>
-                  <Shield className="h-4 w-4" />
-                  <span>Start Audit</span>
+                  <Zap className="h-4 w-4 text-slate-950" />
+                  <span>Run Audit</span>
                 </>
               )}
             </button>
           </form>
+
+          {/* Mac-Style Vault Terminal Card Showcase */}
+          <div className="mt-10 max-w-3xl mx-auto vault-card overflow-hidden text-left border border-white/10 shadow-2xl">
+            {/* macOS Window Title Bar */}
+            <div className="px-4 py-3 bg-[#0E1017]/90 border-b border-white/5 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="w-3 h-3 rounded-full mac-dot-red inline-block" />
+                <span className="w-3 h-3 rounded-full mac-dot-yellow inline-block" />
+                <span className="w-3 h-3 rounded-full mac-dot-green inline-block" />
+                <span className="ml-2 font-mono text-[11px] text-slate-400">
+                  cybershield://ast/audit-engine • DUAL ENGINES ACTIVE
+                </span>
+              </div>
+              <div className="flex items-center gap-2 font-mono text-[10px] text-[#64D771] bg-[#64D771]/10 px-2.5 py-0.5 rounded-full border border-[#64D771]/20">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#64D771] animate-pulse" />
+                <span>AES-256 / AST-TAINT VERIFIED</span>
+              </div>
+            </div>
+
+            {/* Terminal Preview Content */}
+            <div className="p-5 font-mono text-xs space-y-3 bg-[#0A0D14]/90">
+              <div className="flex items-center gap-2 text-slate-400">
+                <span className="text-[#F09E4F]">$</span>
+                <span>cybershield audit --target https://github.com/expressjs/express --dual-engine</span>
+              </div>
+              <div className="text-slate-300 pl-4 border-l-2 border-[#F09E4F]/40 space-y-1.5 text-[11px]">
+                <div className="text-[#64D771] flex items-center gap-1.5">
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  <span>Stage 1: AST Ingestion & Archive validated (Zero-Execution Sandbox)</span>
+                </div>
+                <div className="text-slate-300 flex items-center gap-1.5">
+                  <Terminal className="w-3.5 h-3.5 text-cyan-400" />
+                  <span>Stage 2: Semgrep & OSV Known CVE Engine: 14 dependency advisories identified</span>
+                </div>
+                <div className="text-[#F09E4F] flex items-center gap-1.5">
+                  <Zap className="w-3.5 h-3.5 text-[#F09E4F]" />
+                  <span>Stage 3: Novel AST Taint Tracker: Traced unescaped sink at router/index.js:142</span>
+                </div>
+                <div className="text-slate-400 flex items-center gap-1.5">
+                  <BarChart3 className="w-3.5 h-3.5 text-rose-400" />
+                  <span>Stage 4: Disaster Exposure Formulation: Worst-Case Exposure estimated at $142,500</span>
+                </div>
+              </div>
+              <div className="pt-2 flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setTargetUrl("https://github.com/expressjs/express");
+                    executeScan("https://github.com/expressjs/express");
+                  }}
+                  className="px-3 py-1.5 rounded-full bg-[#F09E4F]/15 hover:bg-[#F09E4F]/25 text-[#F09E4F] border border-[#F09E4F]/30 text-[11px] font-sans font-semibold transition cursor-pointer flex items-center gap-1.5"
+                >
+                  <Zap className="w-3 h-3" />
+                  <span>Live Demo with expressjs/express</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setTargetUrl("https://github.com/lodash/lodash");
+                    executeScan("https://github.com/lodash/lodash");
+                  }}
+                  className="px-3 py-1.5 rounded-full bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 text-[11px] font-sans font-medium transition cursor-pointer"
+                >
+                  Try lodash/lodash
+                </button>
+              </div>
+            </div>
+          </div>
 
           {/* ── User's Connected GitHub Repositories (1-Click Direct Audit) ── */}
           {currentUser?.githubUsername ? (
