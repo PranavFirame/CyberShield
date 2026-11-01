@@ -1,9 +1,17 @@
 import path from "path";
+import fs from "fs";
 import { createRequire } from "module";
 
-// Use createRequire to safely resolve node:sqlite under Next.js and Vite environments
-const require = createRequire(import.meta.url);
-const { DatabaseSync } = require("node:sqlite");
+// Safely resolve node:sqlite if available (Node >= 22.5); otherwise use universal fallback
+let DatabaseSync: any = null;
+try {
+  const req = createRequire(import.meta.url);
+  const sqlite = req("node:sqlite");
+  DatabaseSync = sqlite?.DatabaseSync || null;
+} catch {
+  // node:sqlite is not available (e.g. Node 18/20 or restricted runtime). Universal fallback will be used.
+  DatabaseSync = null;
+}
 
 export interface DbUser {
   id: string;
@@ -89,108 +97,302 @@ const globalForDb = globalThis as unknown as {
   sqliteDb?: SqliteDatabase;
 };
 
+export function createFallbackDatabase(customPath?: string): SqliteDatabase {
+  const filePath = customPath || path.resolve(process.cwd(), "cybershield-store.json");
+  const isMemory = filePath === ":memory:";
+
+  let data: Record<string, any[]> = {
+    users: [],
+    scan_records: [],
+    articles: [],
+    faqs: [],
+    newsletter_subscribers: [],
+  };
+
+  if (!isMemory && fs.existsSync(filePath)) {
+    try {
+      const raw = fs.readFileSync(filePath, "utf-8");
+      data = JSON.parse(raw);
+    } catch {
+      // ignore
+    }
+  }
+
+  const save = () => {
+    if (!isMemory) {
+      try {
+        fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf-8");
+      } catch {}
+    }
+  };
+
+  return {
+    exec(_sql: string) {
+      // DDL operations are safe no-ops in fallback store
+    },
+    prepare(sql: string) {
+      const trimmed = sql.trim().replace(/\s+/g, " ");
+
+      // INSERT
+      const insertMatch = trimmed.match(/^INSERT INTO (\w+)\s*\(([^)]+)\)\s*VALUES/i);
+      if (insertMatch) {
+        const table = insertMatch[1];
+        const cols = insertMatch[2].split(",").map((c) => c.trim());
+        if (!data[table]) data[table] = [];
+
+        return {
+          run(...params: unknown[]) {
+            const row: Record<string, unknown> = {};
+            cols.forEach((col, idx) => {
+              row[col] = params[idx];
+            });
+            if (table === "users" && row.username) {
+              const idx = data.users.findIndex((u) => u.username === row.username);
+              if (idx >= 0) data.users[idx] = row;
+              else data.users.push(row);
+            } else if (table === "newsletter_subscribers" && row.email) {
+              const idx = data.newsletter_subscribers.findIndex((s) => s.email === row.email);
+              if (idx >= 0) data.newsletter_subscribers[idx] = row;
+              else data.newsletter_subscribers.push(row);
+            } else {
+              data[table].push(row);
+            }
+            save();
+            return { changes: 1, lastInsertRowid: data[table].length };
+          },
+          get() { return undefined; },
+          all() { return []; },
+        };
+      }
+
+      // DELETE
+      const deleteMatch = trimmed.match(/^DELETE FROM (\w+)(?:\s+WHERE\s+(\w+)\s*=\s*\?)?/i);
+      if (deleteMatch) {
+        const table = deleteMatch[1];
+        const col = deleteMatch[2];
+        if (!data[table]) data[table] = [];
+
+        return {
+          run(...params: unknown[]) {
+            if (col && params.length > 0) {
+              const val = params[0];
+              const before = data[table].length;
+              data[table] = data[table].filter((r) => r[col] !== val);
+              save();
+              return { changes: before - data[table].length, lastInsertRowid: 0 };
+            }
+            data[table] = [];
+            save();
+            return { changes: 1, lastInsertRowid: 0 };
+          },
+          get() { return undefined; },
+          all() { return []; },
+        };
+      }
+
+      // UPDATE
+      const updateMatch = trimmed.match(/^UPDATE (\w+)\s+SET\s+(.+?)\s+WHERE\s+(\w+)\s*=\s*\?/i);
+      if (updateMatch) {
+        const table = updateMatch[1];
+        const setCols = updateMatch[2].split(",").map((s) => s.trim().split("=")[0].trim());
+        const whereCol = updateMatch[3];
+        if (!data[table]) data[table] = [];
+
+        return {
+          run(...params: unknown[]) {
+            const whereVal = params[params.length - 1];
+            const setVals = params.slice(0, params.length - 1);
+            let changes = 0;
+            data[table].forEach((row) => {
+              if (row[whereCol] === whereVal) {
+                setCols.forEach((col, idx) => {
+                  row[col] = setVals[idx];
+                });
+                changes++;
+              }
+            });
+            if (changes > 0) save();
+            return { changes, lastInsertRowid: 0 };
+          },
+          get() { return undefined; },
+          all() { return []; },
+        };
+      }
+
+      // SELECT
+      const table = trimmed.match(/FROM (\w+)/i)?.[1] || "users";
+      if (!data[table]) data[table] = [];
+
+      const executeQuery = (params: unknown[]) => {
+        let rows = [...(data[table] || [])];
+
+        if (trimmed.includes("WHERE")) {
+          if (trimmed.includes("githubUsername = ?")) {
+            rows = rows.filter((r) => r.githubUsername === params[0]);
+          } else if (trimmed.includes("username = ? AND id != ?")) {
+            rows = rows.filter((r) => r.username === params[0] && r.id !== params[1]);
+          } else if (trimmed.includes("isPublished = 1") || trimmed.includes("isPublished = ?")) {
+            rows = rows.filter((r) => r.isPublished === 1 || r.isPublished === true);
+          } else if (trimmed.includes("username = ? OR email = ?")) {
+            const orTerms = trimmed.match(/(\w+) = \?/g)?.map(t => t.split(" ")[0]) || [];
+            rows = rows.filter((r) => orTerms.some((col, idx) => r[col] && r[col] === params[idx]));
+          } else if (trimmed.includes("id = ?")) {
+            rows = rows.filter((r) => r.id === params[0]);
+          } else if (trimmed.includes("username = ?")) {
+            rows = rows.filter((r) => r.username === params[0]);
+          } else if (trimmed.includes("slug = ?")) {
+            rows = rows.filter((r) => r.slug === params[0]);
+          } else if (trimmed.includes("email = ?")) {
+            rows = rows.filter((r) => r.email === params[0]);
+          } else if (trimmed.includes("userId = ?")) {
+            rows = rows.filter((r) => r.userId === params[0]);
+          } else if (trimmed.includes("status = ?")) {
+            rows = rows.filter((r) => r.status === params[0]);
+          }
+        }
+
+        if (/ORDER BY orderIndex ASC/i.test(trimmed)) {
+          rows.sort((a, b) => (a.orderIndex || 0) - (b.orderIndex || 0));
+        } else if (/ORDER BY (?:createdAt|publishedAt) DESC/i.test(trimmed)) {
+          rows.sort((a, b) => new Date(b.createdAt || b.publishedAt || 0).getTime() - new Date(a.createdAt || a.publishedAt || 0).getTime());
+        }
+
+        if (/LIMIT 1/i.test(trimmed)) {
+          rows = rows.slice(0, 1);
+        } else if (/LIMIT \?/i.test(trimmed)) {
+          const limitVal = Number(params[params.length - 1]);
+          if (!isNaN(limitVal)) rows = rows.slice(0, limitVal);
+        }
+
+        return rows;
+      };
+
+      return {
+        run() { return { changes: 0, lastInsertRowid: 0 }; },
+        get(...params: unknown[]) {
+          const res = executeQuery(params);
+          return res.length > 0 ? { ...res[0] } : undefined;
+        },
+        all(...params: unknown[]) {
+          return executeQuery(params).map((r) => ({ ...r }));
+        },
+      };
+    },
+  };
+}
+
 export function getDatabase(): SqliteDatabase {
   if (!globalForDb.sqliteDb) {
-    const dbPath = path.resolve(process.cwd(), "cybershield.db");
-    const db = new DatabaseSync(dbPath) as unknown as SqliteDatabase;
+    if (DatabaseSync) {
+      try {
+        const dbPath = path.resolve(process.cwd(), "cybershield.db");
+        const db = new DatabaseSync(dbPath) as unknown as SqliteDatabase;
 
-    // Enable WAL mode for high concurrency
-    db.exec("PRAGMA journal_mode = WAL;");
-    db.exec("PRAGMA busy_timeout = 5000;");
-    db.exec("PRAGMA foreign_keys = ON;");
+        // Enable WAL mode for high concurrency
+        db.exec("PRAGMA journal_mode = WAL;");
+        db.exec("PRAGMA busy_timeout = 5000;");
+        db.exec("PRAGMA foreign_keys = ON;");
 
-    db.exec(`
-      CREATE TABLE IF NOT EXISTS users (
-        id TEXT PRIMARY KEY,
-        username TEXT UNIQUE NOT NULL,
-        email TEXT UNIQUE,
-        passwordHash TEXT NOT NULL,
-        role TEXT NOT NULL DEFAULT 'USER',
-        githubUsername TEXT,
-        createdAt TEXT NOT NULL,
-        updatedAt TEXT NOT NULL
-      );
+        db.exec(`
+          CREATE TABLE IF NOT EXISTS users (
+            id TEXT PRIMARY KEY,
+            username TEXT UNIQUE NOT NULL,
+            email TEXT UNIQUE,
+            passwordHash TEXT NOT NULL,
+            role TEXT NOT NULL DEFAULT 'USER',
+            githubUsername TEXT,
+            createdAt TEXT NOT NULL,
+            updatedAt TEXT NOT NULL
+          );
 
-      CREATE TABLE IF NOT EXISTS scan_records (
-        id TEXT PRIMARY KEY,
-        userId TEXT,
-        targetType TEXT NOT NULL,
-        repoUrl TEXT NOT NULL,
-        repoFullName TEXT NOT NULL,
-        defaultBranch TEXT,
-        commitSha TEXT,
-        riskScore REAL NOT NULL,
-        durationMs INTEGER NOT NULL,
-        summaryJson TEXT NOT NULL,
-        findingsJson TEXT NOT NULL,
-        costModelJson TEXT NOT NULL,
-        costAssumptionsJson TEXT NOT NULL,
-        createdAt TEXT NOT NULL,
-        FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
-      );
+          CREATE TABLE IF NOT EXISTS scan_records (
+            id TEXT PRIMARY KEY,
+            userId TEXT,
+            targetType TEXT NOT NULL,
+            repoUrl TEXT NOT NULL,
+            repoFullName TEXT NOT NULL,
+            defaultBranch TEXT,
+            commitSha TEXT,
+            riskScore REAL NOT NULL,
+            durationMs INTEGER NOT NULL,
+            summaryJson TEXT NOT NULL,
+            findingsJson TEXT NOT NULL,
+            costModelJson TEXT NOT NULL,
+            costAssumptionsJson TEXT NOT NULL,
+            createdAt TEXT NOT NULL,
+            FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
+          );
 
-      CREATE INDEX IF NOT EXISTS idx_scans_userId ON scan_records(userId);
-      CREATE INDEX IF NOT EXISTS idx_scans_createdAt ON scan_records(createdAt);
+          CREATE INDEX IF NOT EXISTS idx_scans_userId ON scan_records(userId);
+          CREATE INDEX IF NOT EXISTS idx_scans_createdAt ON scan_records(createdAt);
 
-      CREATE TABLE IF NOT EXISTS articles (
-        id TEXT PRIMARY KEY,
-        slug TEXT UNIQUE NOT NULL,
-        title TEXT NOT NULL,
-        summary TEXT NOT NULL,
-        content TEXT NOT NULL,
-        category TEXT NOT NULL,
-        tagsJson TEXT NOT NULL DEFAULT '[]',
-        authorName TEXT NOT NULL,
-        authorRole TEXT NOT NULL,
-        readingTimeMinutes INTEGER NOT NULL DEFAULT 5,
-        coverImage TEXT,
-        status TEXT NOT NULL DEFAULT 'PUBLISHED',
-        canonicalUrl TEXT,
-        publishedAt TEXT,
-        createdAt TEXT NOT NULL,
-        updatedAt TEXT NOT NULL
-      );
+          CREATE TABLE IF NOT EXISTS articles (
+            id TEXT PRIMARY KEY,
+            slug TEXT UNIQUE NOT NULL,
+            title TEXT NOT NULL,
+            summary TEXT NOT NULL,
+            content TEXT NOT NULL,
+            category TEXT NOT NULL,
+            tagsJson TEXT NOT NULL DEFAULT '[]',
+            authorName TEXT NOT NULL,
+            authorRole TEXT NOT NULL,
+            readingTimeMinutes INTEGER NOT NULL DEFAULT 5,
+            coverImage TEXT,
+            status TEXT NOT NULL DEFAULT 'PUBLISHED',
+            canonicalUrl TEXT,
+            publishedAt TEXT,
+            createdAt TEXT NOT NULL,
+            updatedAt TEXT NOT NULL
+          );
 
-      CREATE INDEX IF NOT EXISTS idx_articles_slug ON articles(slug);
-      CREATE INDEX IF NOT EXISTS idx_articles_status ON articles(status);
-      CREATE INDEX IF NOT EXISTS idx_articles_category ON articles(category);
+          CREATE INDEX IF NOT EXISTS idx_articles_slug ON articles(slug);
+          CREATE INDEX IF NOT EXISTS idx_articles_status ON articles(status);
+          CREATE INDEX IF NOT EXISTS idx_articles_category ON articles(category);
 
-      CREATE TABLE IF NOT EXISTS newsletter_subscribers (
-        id TEXT PRIMARY KEY,
-        email TEXT UNIQUE NOT NULL,
-        status TEXT NOT NULL DEFAULT 'ACTIVE',
-        consentGiven INTEGER NOT NULL DEFAULT 1,
-        consentTimestamp TEXT NOT NULL,
-        source TEXT NOT NULL DEFAULT 'landing',
-        createdAt TEXT NOT NULL,
-        updatedAt TEXT NOT NULL
-      );
+          CREATE TABLE IF NOT EXISTS newsletter_subscribers (
+            id TEXT PRIMARY KEY,
+            email TEXT UNIQUE NOT NULL,
+            status TEXT NOT NULL DEFAULT 'ACTIVE',
+            consentGiven INTEGER NOT NULL DEFAULT 1,
+            consentTimestamp TEXT NOT NULL,
+            source TEXT NOT NULL DEFAULT 'landing',
+            createdAt TEXT NOT NULL,
+            updatedAt TEXT NOT NULL
+          );
 
-      CREATE INDEX IF NOT EXISTS idx_subscribers_email ON newsletter_subscribers(email);
+          CREATE INDEX IF NOT EXISTS idx_subscribers_email ON newsletter_subscribers(email);
 
-      CREATE TABLE IF NOT EXISTS faqs (
-        id TEXT PRIMARY KEY,
-        question TEXT NOT NULL,
-        answer TEXT NOT NULL,
-        category TEXT NOT NULL,
-        orderIndex INTEGER NOT NULL DEFAULT 0,
-        isPublished INTEGER NOT NULL DEFAULT 1,
-        isFeatured INTEGER NOT NULL DEFAULT 0,
-        createdAt TEXT NOT NULL,
-        updatedAt TEXT NOT NULL
-      );
+          CREATE TABLE IF NOT EXISTS faqs (
+            id TEXT PRIMARY KEY,
+            question TEXT NOT NULL,
+            answer TEXT NOT NULL,
+            category TEXT NOT NULL,
+            orderIndex INTEGER NOT NULL DEFAULT 0,
+            isPublished INTEGER NOT NULL DEFAULT 1,
+            isFeatured INTEGER NOT NULL DEFAULT 0,
+            createdAt TEXT NOT NULL,
+            updatedAt TEXT NOT NULL
+          );
 
-      CREATE INDEX IF NOT EXISTS idx_faqs_category ON faqs(category);
-      CREATE INDEX IF NOT EXISTS idx_faqs_order ON faqs(orderIndex);
-    `);
+          CREATE INDEX IF NOT EXISTS idx_faqs_category ON faqs(category);
+          CREATE INDEX IF NOT EXISTS idx_faqs_order ON faqs(orderIndex);
+        `);
 
-    try {
-      db.exec("ALTER TABLE users ADD COLUMN githubUsername TEXT;");
-    } catch {
-      // Column already exists
+        try {
+          db.exec("ALTER TABLE users ADD COLUMN githubUsername TEXT;");
+        } catch {
+          // Column already exists
+        }
+
+        globalForDb.sqliteDb = db;
+        return globalForDb.sqliteDb;
+      } catch (e) {
+        console.warn("node:sqlite failed to initialize, using fallback database:", e);
+      }
     }
 
-    globalForDb.sqliteDb = db;
+    // Universal fallback store (works across Node 18, 20, 22 on all hosts)
+    globalForDb.sqliteDb = createFallbackDatabase();
   }
   return globalForDb.sqliteDb!;
 }
