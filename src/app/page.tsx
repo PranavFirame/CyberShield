@@ -684,25 +684,25 @@ export default function CyberShieldLightApp() {
 
           {/* ── User's Connected GitHub Repositories (1-Click Direct Audit) ── */}
           {currentUser?.githubUsername ? (
-            <div className="mt-8 bg-white border border-slate-200/90 rounded-2xl p-5 shadow-xs text-left">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
-                <div className="flex items-center gap-2.5">
-                  <div className="h-9 w-9 rounded-xl bg-slate-900 text-white flex items-center justify-center shadow-xs shrink-0">
-                    <Github className="h-5 w-5" />
+            <div className="mt-8 vault-card p-6 shadow-2xl text-left border border-white/10">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-white/10">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-full bg-white/5 border border-white/10 text-white flex items-center justify-center shrink-0">
+                    <Github className="h-5 w-5 text-[#F09E4F]" />
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <h3 className="text-sm font-bold text-slate-900">Your GitHub Repositories</h3>
-                      <span className="text-[11px] font-mono px-2 py-0.5 rounded-full bg-sky-50 text-sky-700 border border-sky-200 font-semibold">
+                      <h3 className="text-sm font-bold text-white">Your GitHub Repositories</h3>
+                      <span className="text-[11px] font-mono px-2 py-0.5 rounded-full bg-[#F09E4F]/10 text-[#F09E4F] border border-[#F09E4F]/30 font-semibold">
                         @{currentUser.githubUsername}
                       </span>
                       {userRepos.length > 0 && (
-                        <span className="text-[10px] text-slate-500 font-medium">
+                        <span className="text-[10px] text-slate-400 font-mono">
                           ({userRepos.length} public repos)
                         </span>
                       )}
                     </div>
-                    <p className="text-xs text-slate-500">
+                    <p className="text-xs text-slate-400">
                       Directly audit your public repositories with 1-click. Zero installation, zero execution sandbox.
                     </p>
                   </div>
@@ -715,17 +715,17 @@ export default function CyberShieldLightApp() {
                       placeholder="Filter repos..."
                       value={repoSearchQuery}
                       onChange={(e) => setRepoSearchQuery(e.target.value)}
-                      className="px-2.5 py-1 text-xs border border-slate-200 rounded-lg text-slate-800 bg-slate-50 focus:outline-none focus:border-sky-500"
+                      className="px-3 py-1.5 text-xs border border-white/10 rounded-full text-white bg-white/5 focus:outline-none focus:border-[#F09E4F] placeholder-slate-500 font-mono"
                     />
                   )}
                   <button
                     type="button"
                     onClick={() => fetchUserRepos(currentUser.githubUsername!)}
                     disabled={reposLoading}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 text-xs text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition cursor-pointer disabled:opacity-50"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-white/10 text-xs text-slate-300 hover:text-white hover:bg-white/10 transition cursor-pointer disabled:opacity-50"
                     title="Refresh repositories list"
                   >
-                    <RefreshCw className={`h-3 w-3 ${reposLoading ? "animate-spin" : ""}`} />
+                    <RefreshCw className={`h-3 w-3 ${reposLoading ? "animate-spin text-[#F09E4F]" : ""}`} />
                     <span>Refresh</span>
                   </button>
                 </div>
@@ -735,29 +735,29 @@ export default function CyberShieldLightApp() {
               {reposLoading ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 pt-4">
                   {[1, 2, 3].map((n) => (
-                    <div key={n} className="p-3.5 border border-slate-200 rounded-xl animate-pulse bg-slate-50/50 space-y-2">
-                      <div className="h-4 bg-slate-200 rounded w-3/4" />
-                      <div className="h-3 bg-slate-200 rounded w-5/6" />
+                    <div key={n} className="p-3.5 border border-white/10 rounded-xl animate-pulse bg-white/5 space-y-2">
+                      <div className="h-4 bg-white/10 rounded w-3/4" />
+                      <div className="h-3 bg-white/10 rounded w-5/6" />
                       <div className="flex justify-between items-center pt-2">
-                        <div className="h-3 bg-slate-200 rounded w-1/4" />
-                        <div className="h-6 bg-slate-200 rounded w-20" />
+                        <div className="h-3 bg-white/10 rounded w-1/4" />
+                        <div className="h-6 bg-white/10 rounded w-20" />
                       </div>
                     </div>
                   ))}
                 </div>
               ) : reposError ? (
                 <div className="pt-4 text-center py-6">
-                  <p className="text-xs text-rose-600 mb-2">{reposError}</p>
+                  <p className="text-xs text-rose-400 mb-2">{reposError}</p>
                   <button
                     type="button"
                     onClick={() => fetchUserRepos(currentUser.githubUsername!)}
-                    className="text-xs font-semibold text-sky-600 hover:underline cursor-pointer"
+                    className="text-xs font-semibold text-[#F09E4F] hover:underline cursor-pointer"
                   >
                     Try fetching repositories again
                   </button>
                 </div>
               ) : userRepos.length === 0 ? (
-                <div className="pt-4 text-center py-6 text-xs text-slate-500">
+                <div className="pt-4 text-center py-6 text-xs text-slate-400">
                   No public repositories found for @{currentUser.githubUsername}.
                 </div>
               ) : (
@@ -774,37 +774,38 @@ export default function CyberShieldLightApp() {
                       return (
                         <div
                           key={repo.id}
-                          className="bg-white border border-slate-200 hover:border-sky-300 rounded-xl p-3.5 shadow-2xs flex flex-col justify-between transition hover:shadow-xs group"
+                          className="vault-card p-4 flex flex-col justify-between transition-all hover:border-[#F09E4F]/50 group bg-[#0E111A]/80 border border-white/10"
                         >
                           <div>
-                            <div className="flex items-start justify-between gap-1 mb-1">
-                              <span className="font-semibold text-xs text-slate-900 group-hover:text-sky-600 transition truncate" title={repo.fullName}>
+                            <div className="flex items-start justify-between gap-1 mb-1.5">
+                              <span className="font-semibold text-xs text-white group-hover:text-[#F09E4F] transition truncate" title={repo.fullName}>
                                 {repo.name}
                               </span>
                               <a
                                 href={repo.htmlUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-slate-400 hover:text-slate-700 transition p-0.5"
+                                className="text-slate-500 hover:text-slate-300 transition p-0.5"
                                 title="Open repository in GitHub"
                               >
                                 <ExternalLink className="h-3 w-3" />
                               </a>
                             </div>
 
-                            <p className="text-[11px] text-slate-500 line-clamp-2 mb-2 min-h-[30px]" title={repo.description || "No description"}>
+                            <p className="text-[11px] text-slate-400 line-clamp-2 mb-3 min-h-[30px]" title={repo.description || "No description"}>
                               {repo.description || "No description provided"}
                             </p>
                           </div>
 
-                          <div className="pt-2 border-t border-slate-100 flex items-center justify-between mt-auto">
-                            <div className="flex items-center gap-2 text-[10px] text-slate-500">
+                          <div className="pt-2 border-t border-white/5 flex items-center justify-between mt-auto">
+                            <div className="flex items-center gap-2 text-[10px] text-slate-400 font-mono">
                               {repo.language && (
-                                <span className="font-medium px-1.5 py-0.5 rounded bg-slate-100 text-slate-700">
-                                  {repo.language}
+                                <span className="flex items-center gap-1">
+                                  <span className="h-1.5 w-1.5 rounded-full bg-[#F09E4F]" />
+                                  <span>{repo.language}</span>
                                 </span>
                               )}
-                              <span className="flex items-center gap-0.5 text-slate-400">
+                              <span className="flex items-center gap-0.5 text-slate-500">
                                 ★ {repo.stars}
                               </span>
                             </div>
@@ -813,20 +814,20 @@ export default function CyberShieldLightApp() {
                               type="button"
                               onClick={() => executeScan(repo.htmlUrl)}
                               disabled={isLoading}
-                              className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold shadow-xs transition cursor-pointer ${
+                              className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition cursor-pointer ${
                                 isCurrentAuditing
-                                  ? "bg-sky-100 text-sky-700 border border-sky-300"
-                                  : "bg-sky-600 hover:bg-sky-500 text-white"
+                                  ? "bg-[#F09E4F]/20 text-[#F09E4F] border border-[#F09E4F]/40 animate-pulse"
+                                  : "bg-[#F09E4F] hover:bg-[#E08E3F] text-slate-950 shadow-md shadow-[rgba(240,158,79,0.25)]"
                               } disabled:opacity-50`}
                             >
                               {isCurrentAuditing ? (
                                 <>
-                                  <RefreshCw className="h-3 w-3 animate-spin" />
+                                  <RefreshCw className="h-3 w-3 animate-spin text-[#F09E4F]" />
                                   <span>Auditing...</span>
                                 </>
                               ) : (
                                 <>
-                                  <Zap className="h-3 w-3 text-amber-300" />
+                                  <Zap className="h-3 w-3 text-slate-950" />
                                   <span>1-Click Audit</span>
                                 </>
                               )}
@@ -839,13 +840,13 @@ export default function CyberShieldLightApp() {
               )}
             </div>
           ) : !currentUser ? (
-            <div className="mt-4 text-center">
+            <div className="mt-6 text-center">
               <button
                 type="button"
                 onClick={() => setAuthModalOpen(true)}
-                className="inline-flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-800 transition cursor-pointer"
+                className="inline-flex items-center gap-2 text-xs text-slate-400 hover:text-white transition cursor-pointer px-4 py-2 rounded-full bg-white/5 border border-white/10 hover:border-[#F09E4F]/40"
               >
-                <Github className="h-3.5 w-3.5" />
+                <Github className="h-3.5 w-3.5 text-[#F09E4F]" />
                 <span>Sign in with GitHub to view and 1-click audit all your personal repositories</span>
               </button>
             </div>
@@ -934,19 +935,19 @@ export default function CyberShieldLightApp() {
       {/* ── 1. Empty State — "Nothing saved yet." Explain why and give next steps ── */}
       {scanStage === "IDLE" && !report && !isLoading && (
         <div className="flex-1 flex flex-col items-center justify-center py-16 px-6">
-          <div className="h-16 w-16 rounded-2xl bg-sky-50 border border-sky-200 flex items-center justify-center mb-4 text-sky-600 shadow-sm">
-            <Shield className="h-8 w-8" />
+          <div className="h-16 w-16 rounded-2xl bg-[#131620] border border-white/10 flex items-center justify-center mb-4 text-[#F09E4F] shadow-lg shadow-[rgba(240,158,79,0.15)]">
+            <Shield className="h-8 w-8 text-[#F09E4F]" />
           </div>
-          <h2 className="text-xl font-extrabold text-slate-900 mb-1">Nothing saved yet.</h2>
-          <p className="text-sm text-slate-600 text-center max-w-lg mb-8 leading-relaxed">
+          <h2 className="text-2xl font-black text-white mb-2">Nothing saved yet.</h2>
+          <p className="text-sm text-slate-400 text-center max-w-lg mb-8 leading-relaxed">
             You haven’t run any repository or website security audits yet. Paste any public GitHub repo URL or domain name above, or click one of the verified open-source targets below to see the platform in action.
           </p>
 
-          <div className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">
+          <div className="text-xs font-mono font-bold uppercase tracking-wider text-[#F09E4F] mb-4">
             Recommended Next Step: Choose a Target to Audit
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl w-full">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-4xl w-full">
             {[
               {
                 title: "expressjs/express",
@@ -954,7 +955,7 @@ export default function CyberShieldLightApp() {
                 desc: "Discover real SQLi, path traversal and novel AST logic flaws in seconds.",
                 url: "https://github.com/expressjs/express",
                 badge: "High Severity",
-                badgeCls: "bg-orange-50 text-orange-700 border-orange-200",
+                badgeCls: "bg-rose-500/10 text-rose-400 border-rose-500/30",
               },
               {
                 title: "https://example.com",
@@ -962,7 +963,7 @@ export default function CyberShieldLightApp() {
                 desc: "Audit CSP headers, HSTS enforcement, and server banner leakages.",
                 url: "https://example.com",
                 badge: "Perimeter",
-                badgeCls: "bg-amber-50 text-amber-700 border-amber-200",
+                badgeCls: "bg-amber-500/10 text-amber-400 border-amber-500/30",
               },
               {
                 title: "octocat/Hello-World",
@@ -970,30 +971,30 @@ export default function CyberShieldLightApp() {
                 desc: "Demonstrate a zero-risk clean repository baseline with $0 exposure.",
                 url: "https://github.com/octocat/Hello-World",
                 badge: "Zero Risk",
-                badgeCls: "bg-emerald-50 text-emerald-700 border-emerald-200",
+                badgeCls: "bg-[#64D771]/10 text-[#64D771] border-[#64D771]/30",
               },
             ].map((sample) => (
               <button
                 key={sample.title}
                 type="button"
                 onClick={() => setTargetUrl(sample.url)}
-                className="bg-white hover:bg-sky-50/40 border border-slate-200 hover:border-sky-300 rounded-xl p-5 shadow-xs flex flex-col gap-2.5 text-left transition cursor-pointer group"
+                className="vault-card p-5 flex flex-col gap-3 text-left transition-all hover:border-[#F09E4F]/50 cursor-pointer group"
               >
                 <div className="flex items-center justify-between">
-                  <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold border ${sample.badgeCls}`}>
+                  <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold border ${sample.badgeCls}`}>
                     {sample.badge}
                   </span>
-                  <span className="text-[11px] font-semibold text-sky-600 group-hover:translate-x-0.5 transition-transform flex items-center gap-0.5">
+                  <span className="text-[11px] font-semibold text-[#F09E4F] group-hover:translate-x-1 transition-transform flex items-center gap-1">
                     Select target &rarr;
                   </span>
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-slate-900 group-hover:text-sky-700 transition font-mono">
+                  <h3 className="text-sm font-bold text-white group-hover:text-[#F09E4F] transition font-mono">
                     {sample.title}
                   </h3>
-                  <span className="text-[10px] font-mono text-slate-400">{sample.type}</span>
+                  <span className="text-[10px] font-mono text-slate-500">{sample.type}</span>
                 </div>
-                <p className="text-xs text-slate-600 leading-relaxed">{sample.desc}</p>
+                <p className="text-xs text-slate-400 leading-relaxed">{sample.desc}</p>
               </button>
             ))}
           </div>
