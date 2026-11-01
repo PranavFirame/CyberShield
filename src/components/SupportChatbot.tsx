@@ -101,43 +101,43 @@ export default function SupportChatbot() {
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="relative h-14 w-14 rounded-full bg-slate-900 hover:bg-slate-800 text-white shadow-xl hover:shadow-2xl transition-all duration-200 flex items-center justify-center cursor-pointer group hover:scale-105"
+          className="relative h-14 w-14 rounded-full bg-[#F09E4F] hover:bg-[#E08E3F] text-slate-950 shadow-lg shadow-[rgba(240,158,79,0.3)] hover:shadow-[0_0_24px_rgba(240,158,79,0.45)] transition-all duration-200 flex items-center justify-center cursor-pointer group hover:scale-105"
           title="Open CyberShield Support Assistant"
         >
-          <span className="absolute -top-1 -right-1 h-3.5 w-3.5 rounded-full bg-emerald-500 border-2 border-white animate-pulse" />
-          <MessageSquare className="h-6 w-6 text-sky-400 group-hover:scale-110 transition-transform" />
+          <span className="absolute -top-1 -right-1 h-3.5 w-3.5 rounded-full bg-[#64D771] border-2 border-[#0A0D14] animate-pulse" />
+          <MessageSquare className="h-6 w-6 text-slate-950 group-hover:scale-110 transition-transform" />
         </button>
       )}
 
       {/* Expandable Chat Window */}
       {isOpen && (
-        <div className="w-[360px] sm:w-[420px] h-[540px] max-h-[85vh] bg-white border border-slate-200 rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-5 duration-200">
+        <div className="w-[360px] sm:w-[420px] h-[540px] max-h-[85vh] vault-card bg-[#0A0D14]/95 border border-white/10 rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-5 duration-200">
           {/* Header */}
-          <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white px-5 py-3.5 flex items-center justify-between border-b border-slate-800">
+          <div className="bg-[#0E1017] text-white px-5 py-3.5 flex items-center justify-between border-b border-white/10">
             <div className="flex items-center gap-2.5">
-              <div className="h-8 w-8 rounded-xl bg-sky-600/30 border border-sky-400/40 text-sky-300 flex items-center justify-center shadow-xs">
+              <div className="h-8 w-8 rounded-full bg-[#F09E4F]/15 border border-[#F09E4F]/30 text-[#F09E4F] flex items-center justify-center shadow-xs">
                 <Bot className="h-4 w-4" />
               </div>
               <div>
                 <div className="flex items-center gap-1.5">
                   <h4 className="text-xs font-bold text-white">CyberShield Assistant</h4>
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                  <span className="h-2 w-2 rounded-full bg-[#64D771] animate-pulse" />
                 </div>
-                <p className="text-[10px] text-slate-400">Defensive Knowledge & Support</p>
+                <p className="text-[10px] text-slate-400 font-mono">Defensive AST AI Knowledge</p>
               </div>
             </div>
 
             <div className="flex items-center gap-1">
               <button
                 onClick={handleClear}
-                className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800/80 transition cursor-pointer"
+                className="p-1.5 text-slate-400 hover:text-white rounded-full hover:bg-white/5 transition cursor-pointer"
                 title="Clear conversation"
               >
                 <Trash2 className="h-3.5 w-3.5" />
               </button>
               <button
                 onClick={() => setIsOpen(false)}
-                className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800/80 transition cursor-pointer"
+                className="p-1.5 text-slate-400 hover:text-white rounded-full hover:bg-white/5 transition cursor-pointer"
                 title="Close chat"
               >
                 <X className="h-4 w-4" />
@@ -146,29 +146,29 @@ export default function SupportChatbot() {
           </div>
 
           {/* Messages Body */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-3.5 bg-slate-50/50 text-xs">
+          <div className="flex-1 overflow-y-auto p-4 space-y-3.5 bg-[#0A0D14]/90 text-xs">
             {messages.map((m) => (
               <div
                 key={m.id}
                 className={`flex gap-2 ${m.sender === "user" ? "justify-end" : "justify-start"}`}
               >
                 {m.sender === "bot" && (
-                  <div className="h-6 w-6 rounded-full bg-sky-600 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-2xs">
+                  <div className="h-6 w-6 rounded-full bg-[#F09E4F]/20 text-[#F09E4F] border border-[#F09E4F]/30 flex items-center justify-center shrink-0 mt-0.5">
                     <Shield className="h-3 w-3" />
                   </div>
                 )}
 
                 <div
-                  className={`max-w-[82%] rounded-2xl px-3.5 py-2.5 shadow-2xs ${
+                  className={`max-w-[82%] rounded-2xl px-3.5 py-2.5 shadow-xs ${
                     m.sender === "user"
-                      ? "bg-slate-900 text-white rounded-br-xs"
-                      : "bg-white border border-slate-200 text-slate-800 rounded-bl-xs leading-relaxed"
+                      ? "bg-[#F09E4F] text-slate-950 font-medium rounded-br-xs"
+                      : "bg-[#131620] border border-white/10 text-slate-200 rounded-bl-xs leading-relaxed"
                   }`}
                 >
                   <p className="whitespace-pre-wrap">{m.text}</p>
                   <span
-                    className={`block text-[9px] mt-1 text-right ${
-                      m.sender === "user" ? "text-slate-400" : "text-slate-400"
+                    className={`block text-[9px] mt-1 text-right font-mono ${
+                      m.sender === "user" ? "text-slate-800" : "text-slate-500"
                     }`}
                   >
                     {m.timestamp}
@@ -176,7 +176,7 @@ export default function SupportChatbot() {
                 </div>
 
                 {m.sender === "user" && (
-                  <div className="h-6 w-6 rounded-full bg-slate-700 text-white flex items-center justify-center shrink-0 mt-0.5">
+                  <div className="h-6 w-6 rounded-full bg-white/10 text-white flex items-center justify-center shrink-0 mt-0.5">
                     <User className="h-3 w-3" />
                   </div>
                 )}
@@ -184,9 +184,9 @@ export default function SupportChatbot() {
             ))}
 
             {loading && (
-              <div className="flex items-center gap-2 text-slate-500 text-xs py-1">
-                <Loader2 className="h-3.5 w-3.5 animate-spin text-sky-600" />
-                <span className="italic text-[11px]">Assistant is researching documentation...</span>
+              <div className="flex items-center gap-2 text-slate-400 text-xs py-1 font-mono">
+                <Loader2 className="h-3.5 w-3.5 animate-spin text-[#F09E4F]" />
+                <span className="italic text-[11px]">Assistant researching security specs...</span>
               </div>
             )}
 
@@ -195,13 +195,13 @@ export default function SupportChatbot() {
 
           {/* Suggested Quick Questions */}
           {messages.length <= 3 && (
-            <div className="px-3 py-2 bg-white border-t border-slate-100 flex flex-wrap gap-1.5">
+            <div className="px-3 py-2 bg-[#0E1017] border-t border-white/5 flex flex-wrap gap-1.5">
               {SUGGESTED_QUESTIONS.map((q, i) => (
                 <button
                   key={i}
                   onClick={() => handleSend(q)}
                   disabled={loading}
-                  className="text-[10px] font-medium px-2.5 py-1 rounded-lg bg-sky-50 text-sky-800 hover:bg-sky-100 border border-sky-100 transition text-left cursor-pointer disabled:opacity-50"
+                  className="text-[10px] font-medium px-2.5 py-1 rounded-full bg-white/5 text-[#F09E4F] hover:bg-[#F09E4F]/10 border border-[#F09E4F]/30 transition text-left cursor-pointer disabled:opacity-50"
                 >
                   {q}
                 </button>
@@ -215,7 +215,7 @@ export default function SupportChatbot() {
               e.preventDefault();
               handleSend();
             }}
-            className="p-3 bg-white border-t border-slate-200 flex items-center gap-2"
+            className="p-3 bg-[#0E1017] border-t border-white/10 flex items-center gap-2"
           >
             <input
               type="text"
@@ -223,23 +223,23 @@ export default function SupportChatbot() {
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ask about scans, AST analysis, or risk..."
               disabled={loading}
-              className="flex-1 px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-sky-500 focus:bg-white"
+              className="flex-1 px-3.5 py-2 text-xs bg-white/5 border border-white/10 rounded-full text-white placeholder:text-slate-500 focus:outline-none focus:border-[#F09E4F]"
             />
             <button
               type="submit"
               disabled={loading || !input.trim()}
-              className="h-8 w-8 rounded-xl bg-sky-600 hover:bg-sky-500 disabled:opacity-40 text-white flex items-center justify-center transition cursor-pointer shrink-0 shadow-xs"
+              className="h-8 w-8 rounded-full bg-[#F09E4F] hover:bg-[#E08E3F] disabled:opacity-40 text-slate-950 flex items-center justify-center transition cursor-pointer shrink-0 shadow-md shadow-[rgba(240,158,79,0.25)]"
             >
               <Send className="h-3.5 w-3.5" />
             </button>
           </form>
 
           {/* Bottom Footer Note */}
-          <div className="px-3 py-1.5 bg-slate-100 border-t border-slate-200/60 flex items-center justify-between text-[10px] text-slate-500">
+          <div className="px-3 py-1.5 bg-[#080A0F] border-t border-white/5 flex items-center justify-between text-[10px] text-slate-500 font-mono">
             <span>Grounded in CyberShield specs</span>
             <a
               href="mailto:support@cybershield.dev"
-              className="text-sky-600 hover:underline flex items-center gap-0.5"
+              className="text-[#F09E4F] hover:underline flex items-center gap-0.5"
             >
               Email Support <ExternalLink className="h-2.5 w-2.5" />
             </a>

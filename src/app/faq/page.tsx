@@ -52,31 +52,52 @@ export default async function FaqPage({
     : allFaqs;
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-slate-900 flex flex-col">
+    <div className="min-h-screen bg-[#0A0D14] text-slate-100 flex flex-col">
+      {/* Top Breadcrumb / Nav */}
+      <div className="border-b border-white/10 px-6 py-4 bg-[#0E1017]/80 backdrop-blur-xl">
+        <div className="max-w-5xl mx-auto flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-2 group">
+            <div className="w-7 h-7 rounded-full bg-[#F09E4F]/20 border border-[#F09E4F]/30 flex items-center justify-center">
+              <Shield className="w-3.5 h-3.5 text-[#F09E4F]" />
+            </div>
+            <span className="font-extrabold text-sm text-white">
+              CYBER<span className="text-[#F09E4F]">SHIELD</span>
+            </span>
+          </Link>
+          <div className="flex items-center gap-3 text-xs">
+            <Link href="/" className="text-slate-400 hover:text-white transition">
+              Home
+            </Link>
+            <span className="text-slate-600">/</span>
+            <span className="text-[#F09E4F] font-semibold">FAQ</span>
+          </div>
+        </div>
+      </div>
+
       {/* Hero */}
-      <div className="bg-gradient-to-b from-white via-sky-50/20 to-slate-50 border-b border-slate-200 py-12 px-4 sm:px-6">
+      <div className="relative overflow-hidden bg-gradient-to-b from-[#0A0D14] via-[#0E111A] to-[#131620] border-b border-white/10 py-14 px-4 sm:px-6">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-50 border border-sky-200 text-sky-700 text-xs font-semibold mb-3">
-            <HelpCircle className="h-3.5 w-3.5 text-sky-600" />
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#131620] border border-white/10 text-xs font-mono text-slate-300 mb-4 shadow-lg">
+            <HelpCircle className="h-3.5 w-3.5 text-[#F09E4F]" />
             <span>KNOWLEDGE & SUPPORT CENTER</span>
           </div>
 
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-            Frequently Asked Questions
+          <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight">
+            Frequently Asked <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#F09E4F] to-[#FFA85C]">Questions</span>
           </h1>
-          <p className="mt-2 text-sm sm:text-base text-slate-600 max-w-xl mx-auto leading-relaxed">
+          <p className="mt-3 text-sm sm:text-base text-slate-400 max-w-xl mx-auto leading-relaxed">
             Everything you need to know about CyberShield's dual analysis engines, worst-case disaster risk formulations, and tenant data privacy.
           </p>
 
           {/* Search bar */}
-          <form action="/faq" method="GET" className="mt-6 max-w-md mx-auto relative">
-            <Search className="absolute left-3.5 top-3 h-4 w-4 text-slate-400" />
+          <form action="/faq" method="GET" className="mt-8 max-w-md mx-auto relative">
+            <Search className="absolute left-4 top-3.5 h-4 w-4 text-[#F09E4F]" />
             <input
               type="text"
               name="search"
               defaultValue={searchQuery}
               placeholder="Search questions (e.g. AST, sandbox, pricing)..."
-              className="w-full pl-10 pr-4 py-2.5 text-xs bg-white border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-sky-500 shadow-xs"
+              className="w-full pl-11 pr-4 py-3 text-xs bg-white/5 border border-white/10 rounded-full text-white placeholder:text-slate-500 focus:outline-none focus:border-[#F09E4F] focus:ring-1 focus:ring-[#F09E4F] shadow-2xl font-mono"
             />
             {activeCategory !== "ALL" && (
               <input type="hidden" name="category" value={activeCategory} />
@@ -88,7 +109,7 @@ export default async function FaqPage({
       {/* Main Content */}
       <main className="max-w-4xl w-full mx-auto px-4 sm:px-6 py-10 flex-1 flex flex-col gap-8">
         {/* Category Filter Pills */}
-        <div className="flex flex-wrap gap-1.5 justify-center">
+        <div className="flex flex-wrap gap-2 justify-center">
           {FAQ_CATEGORIES.map((cat) => {
             const isActive = activeCategory === cat;
             const href = cat === "ALL" ? "/faq" : `/faq?category=${encodeURIComponent(cat)}`;
@@ -96,10 +117,10 @@ export default async function FaqPage({
               <Link
                 key={cat}
                 href={href}
-                className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition ${
+                className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition ${
                   isActive
-                    ? "bg-slate-900 text-white shadow-xs"
-                    : "bg-white border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                    ? "bg-[#F09E4F] text-slate-950 shadow-md shadow-[rgba(240,158,79,0.25)]"
+                    : "bg-white/5 border border-white/10 text-slate-400 hover:text-white hover:bg-white/10"
                 }`}
               >
                 {cat}
@@ -110,15 +131,15 @@ export default async function FaqPage({
 
         {/* FAQs Accordion List */}
         {filteredFaqs.length === 0 ? (
-          <div className="text-center py-16 bg-white border border-slate-200 rounded-2xl p-8">
-            <HelpCircle className="h-10 w-10 text-slate-400 mx-auto mb-3" />
-            <h3 className="text-base font-bold text-slate-800">No matching questions</h3>
-            <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
+          <div className="text-center py-16 vault-card p-8 border border-white/10">
+            <HelpCircle className="h-10 w-10 text-slate-500 mx-auto mb-3" />
+            <h3 className="text-base font-bold text-white">No matching questions</h3>
+            <p className="text-xs text-slate-400 mt-1 max-w-sm mx-auto">
               We couldn't find any questions matching your query. Ask our floating AI Support Assistant in the bottom-right corner or reset your filter.
             </p>
             <Link
               href="/faq"
-              className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-900 text-white text-xs font-semibold"
+              className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#F09E4F] text-slate-950 text-xs font-bold shadow-md shadow-[rgba(240,158,79,0.25)]"
             >
               View All Questions
             </Link>
@@ -128,22 +149,22 @@ export default async function FaqPage({
             {filteredFaqs.map((faq) => (
               <details
                 key={faq.id}
-                className="group bg-white border border-slate-200 hover:border-sky-300 rounded-2xl p-4 sm:p-5 transition shadow-2xs open:shadow-xs open:border-sky-300"
+                className="group vault-card border border-white/10 hover:border-[#F09E4F]/40 p-5 rounded-2xl transition-all shadow-lg open:border-[#F09E4F]/50"
               >
-                <summary className="flex items-center justify-between cursor-pointer list-none font-bold text-xs sm:text-sm text-slate-900 group-open:text-sky-600 transition">
+                <summary className="flex items-center justify-between cursor-pointer list-none font-bold text-xs sm:text-sm text-slate-200 group-open:text-[#F09E4F] transition">
                   <span className="pr-4">{faq.question}</span>
                   <ChevronDown className="h-4 w-4 text-slate-400 transition-transform group-open:rotate-180 shrink-0" />
                 </summary>
 
-                <div className="mt-3.5 pt-3 border-t border-slate-100 text-xs text-slate-600 leading-relaxed space-y-2">
+                <div className="mt-3.5 pt-3 border-t border-white/5 text-xs text-slate-300 leading-relaxed space-y-2">
                   <p>{faq.answer}</p>
-                  <div className="pt-2 flex items-center justify-between text-[11px] text-slate-400">
-                    <span className="font-mono bg-slate-100 px-2 py-0.5 rounded text-slate-600">
+                  <div className="pt-2 flex items-center justify-between text-[11px] text-slate-400 font-mono">
+                    <span className="bg-white/5 border border-white/10 px-2.5 py-0.5 rounded-full text-[#F09E4F]">
                       Category: {faq.category}
                     </span>
                     <a
                       href="mailto:support@cybershield.dev"
-                      className="text-sky-600 hover:underline"
+                      className="text-[#F09E4F] hover:underline"
                     >
                       Need clarification? Contact support
                     </a>
@@ -155,9 +176,9 @@ export default async function FaqPage({
         )}
 
         {/* Support Callout Banner */}
-        <div className="bg-gradient-to-r from-slate-900 to-slate-800 text-white rounded-2xl p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-md">
+        <div className="vault-card border border-white/10 p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl">
           <div>
-            <h3 className="text-base font-bold">Still have questions?</h3>
+            <h3 className="text-base font-bold text-white">Still have questions?</h3>
             <p className="text-xs text-slate-400 mt-1 max-w-md">
               Our engineering team is available to assist with custom CI/CD pipelines, novel vulnerability remediation, or private code auditing.
             </p>
@@ -165,7 +186,7 @@ export default async function FaqPage({
 
           <a
             href="mailto:support@cybershield.dev"
-            className="px-4 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 font-semibold text-xs text-white shadow-xs transition flex items-center gap-1.5 shrink-0"
+            className="px-5 py-2.5 rounded-full bg-[#F09E4F] hover:bg-[#E08E3F] font-bold text-xs text-slate-950 shadow-md shadow-[rgba(240,158,79,0.25)] transition flex items-center gap-1.5 shrink-0"
           >
             <MessageSquare className="h-3.5 w-3.5" />
             <span>Contact Security Team</span>

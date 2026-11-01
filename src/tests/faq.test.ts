@@ -44,4 +44,13 @@ describe("FAQ Knowledge Center", () => {
     // Cleanup
     await prisma.faq.delete({ where: { id: testFaq.id } });
   });
+
+  it("faq page template contains CloudVault vault-card drawer styling", async () => {
+    const fs = await import("fs");
+    const path = await import("path");
+    const faqPage = fs.readFileSync(path.resolve(__dirname, "../app/faq/page.tsx"), "utf-8");
+
+    expect(faqPage).toContain("vault-card");
+    expect(faqPage).toContain("#F09E4F");
+  });
 });
