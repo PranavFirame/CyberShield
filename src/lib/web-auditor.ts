@@ -58,7 +58,11 @@ export async function auditLiveWebsite(rawUrl: string): Promise<WebAuditResult> 
 
   let response: Response;
   try {
-    response = await fetch(target, {
+    if (parsedUrl.protocol !== "http:" && parsedUrl.protocol !== "https:") {
+      throw new Error(`SSRF Prevention: Unsupported protocol "${parsedUrl.protocol}"`);
+    }
+    const safeTarget = parsedUrl.toString();
+    response = await fetch(safeTarget, {
       method: "GET",
       headers: {
         "User-Agent": "CyberShield-Security-Auditor/2.0 (Defensive Security Scanner)",

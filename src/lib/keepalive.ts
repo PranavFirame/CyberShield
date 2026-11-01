@@ -44,12 +44,32 @@ const state: KeepaliveStatus = globalForKeepalive.__cybershield_keepalive_status
 
 globalForKeepalive.__cybershield_keepalive_status = state;
 
+function validateKeepaliveUrl(rawUrl: string): URL {
+  const parsed = new URL(rawUrl);
+  if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+    throw new Error("Invalid protocol for keepalive: only http/https allowed");
+  }
+  const host = parsed.hostname.toLowerCase();
+  if (
+    host === "169.254.169.254" ||
+    host.startsWith("169.254.") ||
+    host === "metadata.google.internal"
+  ) {
+    throw new Error("Target destination forbidden by SSRF defense policy");
+  }
+  if (!parsed.pathname.endsWith("/api/health")) {
+    throw new Error("Keepalive target must end with /api/health");
+  }
+  return parsed;
+}
+
 export async function triggerPing(targetUrl?: string): Promise<boolean> {
   const url = targetUrl || state.targetUrl || resolveTargetUrl();
   state.lastPingAt = new Date().toISOString();
 
   try {
-    const res = await fetch(url, {
+    const validatedUrl = validateKeepaliveUrl(url);
+    const res = await fetch(validatedUrl.toString(), {
       method: "GET",
       headers: {
         "User-Agent": "CyberShield-Keepalive/1.0 (Render Keep-Alive Worker)",

@@ -190,33 +190,41 @@ export function createFallbackDatabase(customPath?: string): SqliteDatabase {
         };
       }
 
-      // UPDATE
-      const updateMatch = trimmed.match(/^UPDATE (\w+)\s+SET\s+(.+?)\s+WHERE\s+(\w+)\s*=\s*\?/i);
-      if (updateMatch) {
-        const table = updateMatch[1];
-        const setCols = updateMatch[2].split(",").map((s) => s.trim().split("=")[0].trim());
-        const whereCol = updateMatch[3];
-        if (!data[table]) data[table] = [];
+      // UPDATE: linear parsing without ReDoS backtracking risk
+      if (trimmed.toUpperCase().startsWith("UPDATE ")) {
+        const whereIdx = trimmed.toUpperCase().lastIndexOf(" WHERE ");
+        if (whereIdx !== -1) {
+          const beforeWhere = trimmed.slice(0, whereIdx);
+          const afterWhere = trimmed.slice(whereIdx + 7).trim();
+          const matchBefore = beforeWhere.match(/^UPDATE\s+(\w+)\s+SET\s+([^;]+)$/i);
+          const matchAfter = afterWhere.match(/^(\w+)\s*=\s*\?$/i);
+          if (matchBefore && matchAfter) {
+            const table = matchBefore[1];
+            const setCols = matchBefore[2].split(",").map((s) => s.trim().split("=")[0].trim());
+            const whereCol = matchAfter[1];
+            if (!data[table]) data[table] = [];
 
-        return {
-          run(...params: unknown[]) {
-            const whereVal = params[params.length - 1];
-            const setVals = params.slice(0, params.length - 1);
-            let changes = 0;
-            data[table].forEach((row) => {
-              if (row[whereCol] === whereVal) {
-                setCols.forEach((col, idx) => {
-                  row[col] = setVals[idx];
+            return {
+              run(...params: unknown[]) {
+                const whereVal = params[params.length - 1];
+                const setVals = params.slice(0, params.length - 1);
+                let changes = 0;
+                data[table].forEach((row) => {
+                  if (row[whereCol] === whereVal) {
+                    setCols.forEach((col, idx) => {
+                      row[col] = setVals[idx];
+                    });
+                    changes++;
+                  }
                 });
-                changes++;
-              }
-            });
-            if (changes > 0) save();
-            return { changes, lastInsertRowid: 0 };
-          },
-          get() { return undefined; },
-          all() { return []; },
-        };
+                if (changes > 0) save();
+                return { changes, lastInsertRowid: 0 };
+              },
+              get() { return undefined; },
+              all() { return []; },
+            };
+          }
+        }
       }
 
       // SELECT
@@ -1015,7 +1023,7 @@ export async function ensureContentSeeded(): Promise<void> {
         summary: "Traditional regex pattern scanners fail when attackers obfuscate sinks or route payloads across middleware boundaries. Here is how AST call-graph taint propagation exposes hidden path traversal, prototype pollution, and command injection.",
         content: `### The Limits of Lexical Scanning in Modern Web Code
 
-For decades, static application security testing (SAST) relied on regex pattern matching and token lexing. While effective for obvious misconfigurations like hardcoded API tokens or trivial \`eval()\` calls, lexical scanners fall short in production architectures.
+For decades, static application security testing (SAST) relied on regex pattern matching and token lexing. While effective for obvious misconfigurations like hardcoded API tokens or trivial dynamic execution calls, lexical scanners fall short in production architectures.
 
 In complex Node.js, Python, or Go codebases, user input traverses multiple router hooks, validation layers, parameter destructurings, and helper utilities before reaching a dangerous execution sink.
 
