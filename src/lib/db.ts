@@ -438,6 +438,8 @@ export const prisma = {
 
       return {
         ...args.data,
+        defaultBranch: args.data.defaultBranch ?? null,
+        commitSha: args.data.commitSha ?? null,
         userId: args.data.userId ?? null,
         createdAt: now,
       };
