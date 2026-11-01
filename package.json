@@ -9,6 +9,9 @@
     "lint": "next lint",
     "test": "vitest run"
   },
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "dependencies": {
     "adm-zip": "^0.6.1",
     "clsx": "^2.1.1",

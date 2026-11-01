@@ -13,3 +13,16 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   min-height: 100vh;
 }
+
+/* User Accent & Hover Customization */
+.bg-sky-600 {
+  --tw-bg-opacity: 1;
+  background-color: #ff990a !important;
+}
+
+.bg-sky-600:hover,
+.hover\:bg-sky-500:hover,
+.hover\:bg-sky-600:hover {
+  background-color: #e68a00 !important;
+}
+

@@ -21,10 +21,10 @@ export default function PublicNavbar() {
                 Cyber<span className="text-sky-600">Shield</span>
               </span>
               <span className="text-[9px] sm:text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-sky-50 text-sky-700 border border-sky-200">
-                ENTERPRISE
+                ENTERPRISE SCANNER
               </span>
             </div>
-            <p className="text-[10px] text-slate-400 hidden sm:block font-medium">Defensive Security & AST Analysis</p>
+            <p className="text-[11px] text-slate-500 hidden sm:block">AST Vulnerability Analysis & Disaster Risk Modeling</p>
           </div>
         </Link>
 

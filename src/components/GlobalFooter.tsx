@@ -22,13 +22,21 @@ export default function GlobalFooter() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-8">
           {/* Brand Col */}
           <div className="col-span-1 sm:col-span-2 md:col-span-2">
-            <Link href="/" className="flex items-center gap-2.5">
-              <div className="h-8 w-8 rounded-xl bg-slate-900 text-white flex items-center justify-center shadow-xs">
-                <Shield className="h-4 w-4 text-sky-400" />
+            <Link href="/" className="flex items-center gap-2.5 sm:gap-3 group">
+              <div className="h-8 sm:h-9 w-8 sm:w-9 rounded-xl bg-gradient-to-tr from-sky-600 to-indigo-600 flex items-center justify-center shadow-md shadow-sky-600/20 group-hover:scale-105 transition-transform">
+                <Shield className="h-4 sm:h-5 w-4 sm:w-5 text-white" />
               </div>
-              <span className="font-extrabold text-base tracking-tight text-slate-900">
-                Cyber<span className="text-sky-600">Shield</span>
-              </span>
+              <div>
+                <div className="flex items-center gap-1.5 sm:gap-2">
+                  <span className="font-extrabold text-sm sm:text-base tracking-tight text-slate-900">
+                    Cyber<span className="text-sky-600">Shield</span>
+                  </span>
+                  <span className="text-[9px] sm:text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-sky-50 text-sky-700 border border-sky-200">
+                    ENTERPRISE SCANNER
+                  </span>
+                </div>
+                <p className="text-[11px] text-slate-500 hidden sm:block">AST Vulnerability Analysis & Disaster Risk Modeling</p>
+              </div>
             </Link>
 
             <p className="mt-3 text-xs text-slate-500 leading-relaxed max-w-sm">

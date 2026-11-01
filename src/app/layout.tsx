@@ -6,6 +6,11 @@ import SupportChatbot from "@/components/SupportChatbot";
 export const metadata: Metadata = {
   title: "CyberShield — Defensive Code Security & Vulnerability Scanner",
   description: "Enterprise Code Security Analysis, AST Novel Bug Discovery & Worst-Case Disaster Risk Intelligence Platform",
+  icons: {
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+    ],
+  },
 };
 
 export default function RootLayout({

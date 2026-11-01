@@ -10,6 +10,10 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        sky: {
+          500: "#e68a00",
+          600: "#ff990a",
+        },
         background: {
           DEFAULT: "#080C14",
           surface: "#0F172A",
