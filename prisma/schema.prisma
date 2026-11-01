@@ -1,0 +1,47 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id           String        @id @default(cuid())
+  username     String        @unique
+  email        String?       @unique
+  passwordHash String
+  role         String        @default("USER") // "USER" | "ADMIN"
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  scans        ScanRecord[]
+
+  @@map("users")
+}
+
+model ScanRecord {
+  id                  String   @id @default(cuid())
+  userId              String?
+  targetType          String   // "REPOSITORY" | "WEBSITE"
+  repoUrl             String
+  repoFullName        String
+  defaultBranch       String?
+  commitSha           String?
+  riskScore           Float
+  durationMs          Int
+  summaryJson         String   // JSON string of summary
+  findingsJson        String   // JSON string of findings array
+  costModelJson       String   // JSON string of DisasterCostResult
+  costAssumptionsJson String   // JSON string of DisasterCostAssumptions
+  createdAt           DateTime @default(now())
+
+  user                User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
+  @@map("scan_records")
+}
